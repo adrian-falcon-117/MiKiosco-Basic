@@ -152,6 +152,10 @@ def main(page: Page):
         page.close(ViewCaja.ad_cuenta_corriente)
         page.update()
 
+    def on_producto_seleccionado(e):
+        #print(e.control.selected_index)
+        print(e.selection.value)
+
     ##Funciones de ViewProductos-----------------------------------------------------------------------------------
     # Abrir o Cerrar Dialogo de ViewProducto para Crear una promocion
     def on_seleccionar_fila_producto(e):
@@ -463,6 +467,7 @@ def main(page: Page):
     # Eventos de ViewPaginaPrincipal
     ViewCaja.item_agregar_todo.on_click = on_item_agregar_todo
     ViewCaja.ibtn_cerrar_cuenta_corriente.on_click = on_cerrar_caja_corriente
+    ViewCaja.ac_buscar_producto.on_select = on_producto_seleccionado
 
     # Eventos de ViewProducto
     ViewProducto.ebtn_ver_combos.on_click = on_ver_promociones

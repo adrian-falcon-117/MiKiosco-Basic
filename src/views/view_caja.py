@@ -112,7 +112,7 @@ class ViewCaja(Container):
 
     ######Controles de Contenedor Carriro
     ac_buscar_producto = AutoComplete(
-        suggestions=my_controller.lista_resultado_productos()
+        suggestions=my_controller.resultado_burqueda_producto()
     )
     tf_codigo_barra = TextField(
         prefix_icon=Icons.SEARCH_ROUNDED, label="Descripcion/Codigo de barra"

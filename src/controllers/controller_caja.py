@@ -1,5 +1,6 @@
 from flet import DropdownOption, Text, AutoCompleteSuggestion
 from views import view_caja as my_view
+from model.model_caja import ModelCaja as my_model
 
 
 class ControllerCaja:
@@ -37,17 +38,18 @@ class ControllerCaja:
             lista.append(DropdownOption(key=i, content=Text(value=i)))
         return lista
 
+    
     @classmethod
-    def lista_resultado_productos(self):
-        lista = []
-        for i in self.productos:
-            lista.append(
+    def resultado_burqueda_producto(self):
+        lista_producto = []
+        for i in my_model.get_productos():
+            lista_producto.append(
                 AutoCompleteSuggestion(
-                    key=i,
-                    value=i,
+                    key=i[1],
+                    value=i[1],
                 )
             )
-        return lista
+        return lista_producto
 
     @classmethod
     def action_ebtn_quitar_lista(self):
