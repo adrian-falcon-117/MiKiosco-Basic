@@ -153,16 +153,16 @@ def main(page: Page):
         page.update()
 
     def on_producto_seleccionado(e):
-        #print(e.control.selected_index)
+        # print(e.control.selected_index)
         print(e.selection.value)
 
     ##Funciones de ViewProductos-----------------------------------------------------------------------------------
-    # Abrir o Cerrar Dialogo de ViewProducto para Crear una promocion
     def on_seleccionar_fila_producto(e):
 
         # Permite seleccionar solo una fila a la vez
         for i in range(len(ViewProducto.dt_productos.rows)):
             ViewProducto.dt_productos.rows[i].__setattr__("selected", False)
+            print(e, i)
         e.control.__setattr__("selected", True)
 
         # Obtiene el id de la columna seleccionada
@@ -472,7 +472,7 @@ def main(page: Page):
     # Eventos de ViewProducto
     ViewProducto.ebtn_ver_combos.on_click = on_ver_promociones
     ViewProducto.ebtn_ver_productos.on_click = on_ver_productos
-    ViewProducto.ibtn_cerrar_combo.on_click = on_cerrar_promocion
+    # ViewProducto.ibtn_cerrar_combo.on_click = on_cerrar_promocion
     ViewProducto.obtn_eliminar.on_click = on_eliminar
     ViewProducto.obtn_no.on_click = on_no_eliminar
     ViewProducto.ebtn_si.on_click = on_si_eliminar
@@ -541,6 +541,7 @@ def main(page: Page):
             Tab(
                 icon=Icons.LOCAL_OFFER_ROUNDED, text="Productos", content=ViewProducto()
             ),
+            Tab(icon=Icons.DISCOUNT, text="Combos"),
             Tab(icon=Icons.ATTACH_MONEY_OUTLINED, text="Ventas", content=ViewVentas()),
             Tab(
                 icon=Icons.ACCOUNT_BALANCE_ROUNDED,

@@ -217,9 +217,9 @@ class ViewVentas(Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        self.padding = 5
-        self.bgcolor = self.color_black26
-        self.border_radius = 5
+        # self.padding = 5
+        # self.bgcolor = self.color_black26
+        # self.border_radius = 5
         self.content = Column(
             # alignment=MainAxisAlignment.SPACE_BETWEEN,
             expand=True,
