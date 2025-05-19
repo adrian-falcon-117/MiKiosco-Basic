@@ -113,150 +113,10 @@ class ViewProducto(Container):
     )
     ebtn_editar = ElevatedButton(text="Editar", icon=Icons.EDIT_OUTLINED)
     obtn_eliminar = OutlinedButton(text="Eliminar", icon=Icons.DELETE_OUTLINE)
-    ebtn_ver_combos = ElevatedButton(text="Ver combos", icon=Icons.VISIBILITY_OUTLINED)
 
     ###Controles del AlertDialog Eliminar
     ebtn_si = ElevatedButton(text="Si")
     obtn_no = OutlinedButton(text="No")
-
-    ###Controles de Crear promocion
-    dt_promocion2 = DataTable(
-        # expand=True,
-        # data_row_max_height=40,
-        show_checkbox_column=True,
-        checkbox_horizontal_margin=0,
-        border=border.all(1),
-        border_radius=5,
-        vertical_lines=BorderSide(1),
-        heading_row_color=color_black26,
-        sort_column_index=0,
-        sort_ascending=True,
-        columns=[
-            DataColumn(
-                numeric=True,
-                heading_row_alignment=MainAxisAlignment.START,
-                label=Text(value="ID"),
-            ),
-            DataColumn(
-                heading_row_alignment=MainAxisAlignment.START,
-                label=Text(value="Descripcion"),
-            ),
-            DataColumn(
-                tooltip="Cantidad incluida en la promocion",
-                label=Text(value="Cantidad"),
-                heading_row_alignment=MainAxisAlignment.START,
-            ),
-            DataColumn(
-                tooltip="Descuento por unidad",
-                label=Text(value="Descuento"),
-                heading_row_alignment=MainAxisAlignment.START,
-            ),
-            DataColumn(
-                tooltip="Precio por unidad",
-                label=Text(value="Precio .Un"),
-                heading_row_alignment=MainAxisAlignment.START,
-            ),
-            DataColumn(
-                tooltip="El subtotal de este producto",
-                label=Text(value="Subtotal"),
-                heading_row_alignment=MainAxisAlignment.START,
-            ),
-        ],
-    )
-    dt_combos = DataTable(
-        show_checkbox_column=True,
-        checkbox_horizontal_margin=0,
-        border=border.all(1),
-        border_radius=5,
-        vertical_lines=BorderSide(1),
-        heading_row_color=color_black26,
-        sort_column_index=0,
-        sort_ascending=True,
-        columns=[
-            DataColumn(
-                numeric=True,
-                heading_row_alignment=MainAxisAlignment.START,
-                label=Text(value="ID"),
-            ),
-            DataColumn(
-                heading_row_alignment=MainAxisAlignment.START,
-                label=Text(value="Descripcion"),
-            ),
-            DataColumn(
-                label=Text(value="Cantidad"),
-                heading_row_alignment=MainAxisAlignment.START,
-            ),
-            DataColumn(
-                label=Text(value="Precio de compra"),
-                heading_row_alignment=MainAxisAlignment.START,
-            ),
-            DataColumn(
-                label=Text(value="Recargo"),
-                heading_row_alignment=MainAxisAlignment.START,
-            ),
-            DataColumn(
-                label=Text(value="Precio de Venta"),
-                heading_row_alignment=MainAxisAlignment.START,
-            ),
-        ],
-    )
-    ebtn_ver_productos = ElevatedButton(
-        text="Ver productos", icon=Icons.VISIBILITY_OUTLINED
-    )
-    ebtn_crear_combo = ElevatedButton(
-        text="Crear combo", icon=Icons.ADD_CIRCLE_OUTLINE_OUTLINED
-    )
-    obtn_promocion_cancelar = OutlinedButton(text="Cancelar")
-    ebtn_promocion_quitar = ElevatedButton(text="Quitar")
-    tf_promocion_nombre = TextField(label="Nombre de combo")
-    txt_promocion_total = Text(value="Total:...")
-
-    ebtn_editar_promocion = ElevatedButton(text="Editar combo")
-    ebtn_activar_promocion = ElevatedButton(text="Activar")
-    obtn_desactivar_promocion = OutlinedButton(text="Desactivar")
-
-    ###Controles de crear Combos
-    tf_nombre_combo = TextField(label="Nombre del combo")
-    tf_descuento_combo = TextField(label="Descuento general")
-    ebtn_agregar_producto = ElevatedButton(
-        text="Agregar productos", icon=Icons.FORMAT_LIST_BULLETED_ADD
-    )
-    ebtn_guardar_combo = ElevatedButton(text="Guardar")
-    ibtn_cancelar_combo = IconButton(tooltip="Cancelar", icon=Icons.CLOSE_ROUNDED)
-    ibtn_cerrar_agregar_producto = IconButton(icon=Icons.CLOSE)
-    dt_promociones_activas = DataTable(
-        # expand=True,
-        # data_row_max_height=40,
-        show_checkbox_column=True,
-        checkbox_horizontal_margin=0,
-        border=border.all(1),
-        border_radius=5,
-        vertical_lines=BorderSide(1),
-        heading_row_color=color_black26,
-        sort_column_index=0,
-        sort_ascending=True,
-        columns=[
-            DataColumn(
-                heading_row_alignment=MainAxisAlignment.START,
-                label=Text(value="Productos"),
-            ),
-            DataColumn(
-                heading_row_alignment=MainAxisAlignment.START,
-                label=Text(value="Cantidad"),
-            ),
-            DataColumn(
-                heading_row_alignment=MainAxisAlignment.START,
-                label=Text(value="Total"),
-            ),
-        ],
-    )
-
-    ###Controles de Dialogo Agregar Producto
-    ac_buscar_producto = AutoComplete()
-    tx_nombre_prodecto = Text(value="Producto:")
-    tf_cantidad_produto = TextField(label="Cantidad")
-    tx_precio_subtotal = Text(value="Subtotal:")
-    ebtn_agregar = ElevatedButton(text="Agregar")
 
     ##Contenedor Agregar Productos
     cont_agregar_producto = Container(
@@ -320,98 +180,11 @@ class ViewProducto(Container):
                 ),
                 Row(
                     alignment=MainAxisAlignment.CENTER,
-                    controls=[ebtn_ver_combos, ebtn_editar, obtn_eliminar],
+                    controls=[ebtn_editar, obtn_eliminar],
                 ),
             ],
         ),
     )
-
-    cont_productos = Container(
-        # padding=5,
-        # bgcolor=color_black26,
-        border_radius=5,
-        expand=True,
-        content=Column(
-            expand=True,
-            controls=[cont_agregar_producto, cont_producto],
-        ),
-    )
-
-    ##Contenedor Crear combos
-    cont_combos = Container(
-        visible=False,
-        padding=5,
-        bgcolor=color_black26,
-        border_radius=5,
-        expand=True,
-        content=Column(
-            expand=True,
-            controls=[
-                Row(
-                    controls=[
-                        Icon(name=Icons.DISCOUNT_OUTLINED),
-                        Text(value="Combos"),
-                    ]
-                ),
-                hor_divider,
-                Column(
-                    expand=True,
-                    scroll=ScrollMode.AUTO,
-                    controls=[ResponsiveRow(expand=True, controls=[dt_combos])],
-                ),
-                Row(
-                    alignment=MainAxisAlignment.CENTER,
-                    controls=[
-                        ebtn_ver_productos,
-                        ebtn_crear_combo,
-                    ],
-                ),
-            ],
-        ),
-    )
-
-    cont_crear_combos = Container(
-        visible=False,
-        # padding=5,
-        # bgcolor=color_black26,
-        # border_radius=5,
-        expand=True,
-        content=Column(
-            expand=True,
-            controls=[
-                Row(
-                    controls=[
-                        Icon(name=Icons.DISCOUNT_OUTLINED),
-                        Text(value="Crear combos"),
-                    ]
-                ),
-                hor_divider,
-                Row(
-                    controls=[
-                        tf_nombre_combo,
-                        tf_descuento_combo,
-                        ebtn_agregar_producto,
-                        ebtn_guardar_combo,
-                        ibtn_cancelar_combo,
-                    ]
-                ),
-                Column(
-                    expand=True,
-                    scroll=ScrollMode.AUTO,
-                    controls=[ResponsiveRow(expand=True, controls=[dt_combos])],
-                ),
-                Row(
-                    alignment=MainAxisAlignment.CENTER,
-                    controls=[
-                        ebtn_ver_productos,
-                        ebtn_crear_combo,
-                    ],
-                ),
-            ],
-        ),
-    )
-
-    ad_crear_combos = AlertDialog(modal=True)
 
     ad_eliminar_producto = AlertDialog(
         modal=True,
@@ -425,5 +198,5 @@ class ViewProducto(Container):
         self.content = Column(
             # alignment=MainAxisAlignment.SPACE_BETWEEN,
             expand=True,
-            controls=[self.cont_productos, self.cont_combos],
+            controls=[self.cont_agregar_producto, self.cont_producto],
         )

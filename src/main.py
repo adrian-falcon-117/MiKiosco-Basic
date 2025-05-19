@@ -470,14 +470,14 @@ def main(page: Page):
     ViewCaja.ac_buscar_producto.on_select = on_producto_seleccionado
 
     # Eventos de ViewProducto
-    ViewProducto.ebtn_ver_combos.on_click = on_ver_promociones
-    ViewProducto.ebtn_ver_productos.on_click = on_ver_productos
+    #ViewProducto.ebtn_ver_combos.on_click = on_ver_promociones
+    #ViewProducto.ebtn_ver_productos.on_click = on_ver_productos
     # ViewProducto.ibtn_cerrar_combo.on_click = on_cerrar_promocion
     ViewProducto.obtn_eliminar.on_click = on_eliminar
     ViewProducto.obtn_no.on_click = on_no_eliminar
     ViewProducto.ebtn_si.on_click = on_si_eliminar
     ViewProducto.dt_productos.rows = get_all_productos()
-    ViewProducto.dt_combos.rows = get_all_productos()
+    #ViewProducto.dt_combos.rows = get_all_productos()
     ViewProducto.ebtn_guardar_producto.on_click = on_guardar_producto
     ViewProducto.ebtn_editar.on_click = on_editar_producto
     ViewProducto.tf_recargo.on_change = on_aplicar_recargo
