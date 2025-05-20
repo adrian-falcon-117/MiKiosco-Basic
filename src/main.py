@@ -32,10 +32,13 @@ from flet import (
     SnackBar,
     DataRow,
     DataCell,
+    RoundedRectangleBorder,
+    SnackBarBehavior,
 )
 from views.view_login import ViewLogin
 from views.view_caja import ViewCaja
 from views.view_productos import ViewProducto
+from views.view_combos import ViewCombos
 from views.view_ventas import ViewVentas
 from views.view_cuenta_corriente import ViewCuentaCorriente
 from views.view_movimiento_caja import ViewMovimientoCaja
@@ -125,7 +128,13 @@ def main(page: Page):
 
     # Mensaje en la parte inferior
     def mensaje(mensaje):
-        sbar = SnackBar(content=Text(value=mensaje))
+        sbar = SnackBar(
+            behavior=SnackBarBehavior.FLOATING,
+            width=300,
+            shape=RoundedRectangleBorder(radius=5),
+            show_close_icon=True,
+            content=Text(value=mensaje),
+        )
         page.open(sbar)
 
     ##Funciones de ViewLogin
@@ -311,6 +320,17 @@ def main(page: Page):
         ControllerProductos.action_cancelar_producto()
         page.update()
 
+    ##Funciones de ViewCombos------------------------------------------------------------------------
+    def on_crear_combo(e):
+        ViewCombos.cont_crear_combos.visible = True
+        ViewCombos.cont_combos.visible = False
+        page.update()
+
+    def on_ver_combos(e):
+        ViewCombos.cont_crear_combos.visible = False
+        ViewCombos.cont_combos.visible = True
+        page.update()
+
     ##Funciones de ViewCuentaCorriente----------------------------------------------------------------
     def on_ver_estado_cuenta(e):
         print(e)
@@ -470,14 +490,14 @@ def main(page: Page):
     ViewCaja.ac_buscar_producto.on_select = on_producto_seleccionado
 
     # Eventos de ViewProducto
-    #ViewProducto.ebtn_ver_combos.on_click = on_ver_promociones
-    #ViewProducto.ebtn_ver_productos.on_click = on_ver_productos
+    # ViewProducto.ebtn_ver_combos.on_click = on_ver_promociones
+    # ViewProducto.ebtn_ver_productos.on_click = on_ver_productos
     # ViewProducto.ibtn_cerrar_combo.on_click = on_cerrar_promocion
     ViewProducto.obtn_eliminar.on_click = on_eliminar
     ViewProducto.obtn_no.on_click = on_no_eliminar
     ViewProducto.ebtn_si.on_click = on_si_eliminar
     ViewProducto.dt_productos.rows = get_all_productos()
-    #ViewProducto.dt_combos.rows = get_all_productos()
+    # ViewProducto.dt_combos.rows = get_all_productos()
     ViewProducto.ebtn_guardar_producto.on_click = on_guardar_producto
     ViewProducto.ebtn_editar.on_click = on_editar_producto
     ViewProducto.tf_recargo.on_change = on_aplicar_recargo
@@ -485,6 +505,10 @@ def main(page: Page):
     ViewProducto.tf_precio_venta.on_change = on_validar_precio_venta
     ViewProducto.tf_cantidad.on_change = on_validar_cantidad
     ViewProducto.ibtn_cancelar_producto.on_click = on_cancelar_producto
+
+    # Eventos de ViewCombos
+    ViewCombos.ebtn_crear_combo.on_click = on_crear_combo
+    ViewCombos.ebtn_ver_combos.on_click = on_ver_combos
 
     # Eventos de ViewCuentaCorriente
     ViewCuentaCorriente.ebtn_ver_estado_cuenta.on_click = on_ver_estado_cuenta
@@ -541,7 +565,7 @@ def main(page: Page):
             Tab(
                 icon=Icons.LOCAL_OFFER_ROUNDED, text="Productos", content=ViewProducto()
             ),
-            Tab(icon=Icons.DISCOUNT, text="Combos"),
+            Tab(icon=Icons.DISCOUNT, text="Combos", content=ViewCombos()),
             Tab(icon=Icons.ATTACH_MONEY_OUTLINED, text="Ventas", content=ViewVentas()),
             Tab(
                 icon=Icons.ACCOUNT_BALANCE_ROUNDED,
