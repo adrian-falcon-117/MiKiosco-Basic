@@ -137,7 +137,7 @@ def main(page: Page):
         )
         page.open(sbar)
 
-    ##Funciones de ViewLogin
+    ##Funciones de ViewLogin----------------------------------------------------------------
     def on_usuario(e):
         ControllerConfiguracion.contrasena_usuario()
 
@@ -167,21 +167,31 @@ def main(page: Page):
 
     ##Funciones de ViewProductos-----------------------------------------------------------------------------------
     def on_seleccionar_fila_producto(e):
+        global id_producto, descripcion_producto, cantidad_producto, precio_compra_producto, recargo_producto, precio_venta_producto, estado_guardar_producto
+        ControllerProductos.action_cancelar_producto()
+        id_producto = None
+        descripcion_producto = None
+        cantidad_producto = None
+        precio_compra_producto = None
+        recargo_producto = None
+        precio_venta_producto = None
+        estado_guardar_producto = True
 
         # Permite seleccionar solo una fila a la vez
-        for i in range(len(ViewProducto.dt_productos.rows)):
-            ViewProducto.dt_productos.rows[i].__setattr__("selected", False)
-            print(e, i)
-        e.control.__setattr__("selected", True)
+        if e.control.selected:
+            e.control.selected = False
+        else:
+            for i in range(len(ViewProducto.dt_productos.rows)):
+                ViewProducto.dt_productos.rows[i].selected = False
+            e.control.selected = True
+            # Obtiene los datos de la fila seleccionada
+            id_producto = int(e.control.cells[0].content.value)
+            descripcion_producto = e.control.cells[1].content.value
+            cantidad_producto = int(e.control.cells[2].content.value)
+            precio_compra_producto = int(e.control.cells[3].content.value)
+            recargo_producto = int(e.control.cells[4].content.value)
+            precio_venta_producto = int(e.control.cells[5].content.value)
 
-        # Obtiene el id de la columna seleccionada
-        global id_producto, descripcion_producto, cantidad_producto, precio_compra_producto, recargo_producto, precio_venta_producto
-        id_producto = int(e.control.cells[0].content.value)
-        descripcion_producto = e.control.cells[1].content.value
-        cantidad_producto = int(e.control.cells[2].content.value)
-        precio_compra_producto = int(e.control.cells[3].content.value)
-        recargo_producto = int(e.control.cells[4].content.value)
-        precio_venta_producto = int(e.control.cells[5].content.value)
         page.update()
 
     def get_all_productos():
@@ -331,6 +341,14 @@ def main(page: Page):
         ViewCombos.cont_combos.visible = True
         page.update()
 
+    def on_agregar_producto(e):
+        page.open(ViewCombos.ad_seleccionar_productos)
+        page.update()
+
+    def on_cerrar_agregar_producto(e):
+        page.close(ViewCombos.ad_seleccionar_productos)
+        page.update()
+
     ##Funciones de ViewCuentaCorriente----------------------------------------------------------------
     def on_ver_estado_cuenta(e):
         print(e)
@@ -386,17 +404,25 @@ def main(page: Page):
 
     # Cuando se selecciona una fila
     def on_seleccionar_fila_usuario(e):
+        global id_usuario, nombre_usuario, contrasena_usuario, estado_guardar_usuario
+        ControllerConfiguracion.action_cancelar_usuario()
+        estado_guardar_usuario = True
+        id_usuario = None
+        nombre_usuario = None
+        contrasena_usuario = None
 
         # Permite seleccionar solo una fila a la vez
-        for i in range(len(ViewConfiguracion.dt_usuarios.rows)):
-            ViewConfiguracion.dt_usuarios.rows[i].__setattr__("selected", False)
-        e.control.__setattr__("selected", True)
+        if e.control.selected:
+            e.control.selected = False
+        else:
+            for i in range(len(ViewConfiguracion.dt_usuarios.rows)):
+                ViewConfiguracion.dt_usuarios.rows[i].selected = False
+            e.control.selected = True
 
-        # Obtiene el id de la columna seleccionada
-        global id_usuario, nombre_usuario, contrasena_usuario
-        id_usuario = int(e.control.cells[0].content.value)
-        nombre_usuario = e.control.cells[1].content.value
-        contrasena_usuario = e.control.cells[2].content.value
+            # Obtiene los datos de la fila seleccionada
+            id_usuario = int(e.control.cells[0].content.value)
+            nombre_usuario = e.control.cells[1].content.value
+            contrasena_usuario = e.control.cells[2].content.value
         page.update()
 
     # Carga todos los usuarios a la tabla
@@ -462,16 +488,23 @@ def main(page: Page):
         if id_usuario == 1:
             mensaje("Usuario Administrador no se puede eliminar")
         else:
-            page.open(ViewConfiguracion.ad_eliminar_usuario)
+            if id_usuario:
+                page.open(ViewConfiguracion.ad_eliminar_usuario)
+            else:
+                mensaje("Seleccione un usuario")
 
     # Cuando se preciona el boton editar
     def on_editar_usuario(e):
         global estado_guardar_usuario
-        ControllerConfiguracion.action_editar_usuario(
-            nombre_usuario, contrasena_usuario, id_usuario
-        )
-        print(nombre_usuario, contrasena_usuario, id_usuario)
-        estado_guardar_usuario = False
+
+        if id_usuario:
+            ControllerConfiguracion.action_editar_usuario(
+                nombre_usuario, contrasena_usuario, id_usuario
+            )
+            print(nombre_usuario, contrasena_usuario, id_usuario)
+            estado_guardar_usuario = False
+        else:
+            mensaje("Seleccione un usuario")
         page.update()
 
     # Limpia los campos de Nombre y Contraseña
@@ -509,6 +542,8 @@ def main(page: Page):
     # Eventos de ViewCombos
     ViewCombos.ebtn_crear_combo.on_click = on_crear_combo
     ViewCombos.ebtn_ver_combos.on_click = on_ver_combos
+    ViewCombos.ebtn_agregar_producto.on_click = on_agregar_producto
+    ViewCombos.ibtn_cerrar_seleccionar_productos.on_click = on_cerrar_agregar_producto
 
     # Eventos de ViewCuentaCorriente
     ViewCuentaCorriente.ebtn_ver_estado_cuenta.on_click = on_ver_estado_cuenta

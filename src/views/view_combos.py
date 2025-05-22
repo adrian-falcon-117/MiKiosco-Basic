@@ -22,6 +22,8 @@ from flet import (
     ExpansionPanel,
     ExpansionPanelList,
     padding,
+    AlertDialog,
+    AutoComplete,
 )
 
 
@@ -59,6 +61,14 @@ class ViewCombos(Container):
     ebtn_editar_combo = ElevatedButton(text="Editar", icon=Icons.EDIT_OUTLINED)
     obtn_eliminar_combo = OutlinedButton(text="Eliminar", icon=Icons.DELETE_OUTLINE)
 
+    ###Controles de Dialog seleccionar producto
+    ac_buscar_producto = AutoComplete()
+    tf_cantidad_producto = TextField(label="Cantidad", expand=True)
+    ebtn_agregar = ElevatedButton(text="Agregar")
+    ibtn_cerrar_seleccionar_productos = IconButton(
+        tooltip="Cancelar", icon=Icons.CLOSE_ROUNDED
+    )
+
     dt_combos = DataTable(
         show_checkbox_column=True,
         checkbox_horizontal_margin=0,
@@ -80,14 +90,6 @@ class ViewCombos(Container):
             ),
             DataColumn(
                 label=Text(value="Cantidad"),
-                heading_row_alignment=MainAxisAlignment.START,
-            ),
-            DataColumn(
-                label=Text(value="Precio de compra"),
-                heading_row_alignment=MainAxisAlignment.START,
-            ),
-            DataColumn(
-                label=Text(value="Recargo"),
                 heading_row_alignment=MainAxisAlignment.START,
             ),
             DataColumn(
@@ -222,6 +224,41 @@ class ViewCombos(Container):
                     ],
                 ),
             ],
+        ),
+    )
+
+    ad_seleccionar_productos = AlertDialog(
+        modal=True,
+        content=Container(
+            width=400,
+            height=250,
+            expand=True,
+            content=Column(
+                expand=True,
+                controls=[
+                    Row(
+                        alignment=MainAxisAlignment.SPACE_BETWEEN,
+                        controls=[
+                            Row(
+                                controls=[
+                                    Icon(name=Icons.DISCOUNT_OUTLINED),
+                                    Text(value="Seleccione un producto"),
+                                ]
+                            ),
+                            Row(controls=[ibtn_cerrar_seleccionar_productos]),
+                        ],
+                    ),
+                    hor_divider,
+                    Row(
+                        expand=True,
+                        controls=[
+                            Container(height=50, width=200, content=ac_buscar_producto),
+                            tf_cantidad_producto,
+                        ],
+                    ),
+                    Row(alignment=MainAxisAlignment.CENTER, controls=[ebtn_agregar]),
+                ],
+            ),
         ),
     )
 

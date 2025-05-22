@@ -19,9 +19,6 @@ from flet import (
     Radio,
     DataTable,
     DataColumn,
-    DataRow,
-    DataCell,
-    TextAlign,
     border,
     BorderSide,
     AlertDialog,
@@ -169,21 +166,22 @@ class ViewConfiguracion(Container):
                 ),
                 hor_divider,
                 Row(
+                    expand=True,
                     controls=[
                         tf_transferencia_recargo,
                         tf_debito_recargo,
-                    ]
+                    ],
                 ),
                 Row(
+                    expand=True,
                     controls=[
                         tf_credito_recargo_uno,
                         tf_credito_recargo_dos,
                         tf_credito_recargo_tres,
                         tf_credito_recargo_seis,
-                    ]
+                    ],
                 ),
                 Row(
-                    expand=True,
                     alignment=MainAxisAlignment.CENTER,
                     controls=[
                         ebtn_guardar_recargos,
