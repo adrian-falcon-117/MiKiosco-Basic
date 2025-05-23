@@ -26,6 +26,8 @@ from flet import (
     AutoComplete,
 )
 
+from controllers.controller_combos import ControllerCombo as my_controller
+
 
 class ViewCombos(Container):
 
@@ -46,7 +48,7 @@ class ViewCombos(Container):
         expand=True,
     )
     ebtn_agregar_producto = ElevatedButton(
-        text="Agregar productos", icon=Icons.FORMAT_LIST_BULLETED_ADD
+        text="Agregar producto", icon=Icons.ADD_CIRCLE_OUTLINE
     )
     ebtn_guardar_combo = ElevatedButton(text="Guardar", icon=Icons.SAVE_OUTLINED)
     ibtn_cancelar_combo = IconButton(tooltip="Cancelar", icon=Icons.CLOSE_ROUNDED)
@@ -62,8 +64,11 @@ class ViewCombos(Container):
     obtn_eliminar_combo = OutlinedButton(text="Eliminar", icon=Icons.DELETE_OUTLINE)
 
     ###Controles de Dialog seleccionar producto
-    ac_buscar_producto = AutoComplete()
-    tf_cantidad_producto = TextField(label="Cantidad", expand=True)
+    ac_buscar_producto = AutoComplete(
+        suggestions=my_controller.resultado_burqueda_producto()
+    )
+    tf_cantidad_producto = TextField(label="Cantidad", width=100)
+    txt_subtotal = Text(value="Subtotal: $999999")
     ebtn_agregar = ElevatedButton(text="Agregar")
     ibtn_cerrar_seleccionar_productos = IconButton(
         tooltip="Cancelar", icon=Icons.CLOSE_ROUNDED
@@ -93,7 +98,7 @@ class ViewCombos(Container):
                 heading_row_alignment=MainAxisAlignment.START,
             ),
             DataColumn(
-                label=Text(value="Precio de Venta"),
+                label=Text(value="Subtotal"),
                 heading_row_alignment=MainAxisAlignment.START,
             ),
         ],
@@ -230,8 +235,8 @@ class ViewCombos(Container):
     ad_seleccionar_productos = AlertDialog(
         modal=True,
         content=Container(
-            width=400,
-            height=250,
+            width=450,
+            height=200,
             expand=True,
             content=Column(
                 expand=True,
@@ -241,7 +246,7 @@ class ViewCombos(Container):
                         controls=[
                             Row(
                                 controls=[
-                                    Icon(name=Icons.DISCOUNT_OUTLINED),
+                                    Icon(name=Icons.LOCAL_OFFER_OUTLINED),
                                     Text(value="Seleccione un producto"),
                                 ]
                             ),
@@ -254,6 +259,7 @@ class ViewCombos(Container):
                         controls=[
                             Container(height=50, width=200, content=ac_buscar_producto),
                             tf_cantidad_producto,
+                            txt_subtotal,
                         ],
                     ),
                     Row(alignment=MainAxisAlignment.CENTER, controls=[ebtn_agregar]),
