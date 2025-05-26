@@ -47,6 +47,7 @@ from views.view_configuracion import ViewConfiguracion
 from controllers.controller_caja import ControllerCaja
 from controllers.controller_productos import ControllerProductos
 from controllers.controller_configuracion import ControllerConfiguracion
+from controllers.controller_combos import ControllerCombo
 
 # import os
 # import winreg
@@ -349,6 +350,13 @@ def main(page: Page):
         page.close(ViewCombos.ad_seleccionar_productos)
         page.update()
 
+    def on_producto_seleccionado(e):
+        producto = ControllerCombo.action_producto_seleccionado(e.selection.value)
+
+        print(producto[0])
+        # print(producto[1])
+        # print(producto[5])
+
     ##Funciones de ViewCuentaCorriente----------------------------------------------------------------
     def on_ver_estado_cuenta(e):
         print(e)
@@ -544,6 +552,7 @@ def main(page: Page):
     ViewCombos.ebtn_ver_combos.on_click = on_ver_combos
     ViewCombos.ebtn_agregar_producto.on_click = on_agregar_producto
     ViewCombos.ibtn_cerrar_seleccionar_productos.on_click = on_cerrar_agregar_producto
+    ViewCombos.ac_buscar_producto.on_select = on_producto_seleccionado
 
     # Eventos de ViewCuentaCorriente
     ViewCuentaCorriente.ebtn_ver_estado_cuenta.on_click = on_ver_estado_cuenta

@@ -9,7 +9,6 @@ class ModelCombos:
     except Exception:
         print(Exception)  # Conexion a Base de Datos
 
-
     @classmethod
     def get_descripcion_producto(self):
         try:
@@ -19,4 +18,17 @@ class ModelCombos:
             print("Error al obtener los productos")
 
         return productos
-    
+
+    @classmethod
+    def get_producto(self, descripcion):
+        producto = []
+        try:
+            self.cursor.execute(
+                "SELECT id, precio_venta FROM productos WHERE descripcion = ?",
+                (descripcion,),
+            )
+            producto = self.cursor.fetchall()
+        except Exception:
+            print("Error al obtener los productos")
+
+        return producto

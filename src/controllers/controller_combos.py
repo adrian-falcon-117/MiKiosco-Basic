@@ -16,3 +16,9 @@ class ControllerCombo:
                 )
             )
         return lista_producto
+
+    @classmethod
+    def action_producto_seleccionado(self, descripcion):
+        producto = my_model.get_producto(descripcion)
+
+        return producto
