@@ -24,11 +24,25 @@ class ModelCombos:
         producto = []
         try:
             self.cursor.execute(
-                "SELECT id, precio_venta FROM productos WHERE descripcion = ?",
+                "SELECT id, descripcion, precio_venta FROM productos WHERE descripcion = ?",
                 (descripcion,),
             )
             producto = self.cursor.fetchall()
         except Exception:
             print("Error al obtener los productos")
+
+        return producto
+
+    @classmethod
+    def get_producto2(self, descripcion):
+        producto = []
+        try:
+            self.cursor.execute(
+                "SELECT id, descripcion, precio_venta FROM productos WHERE descripcion LIKE ? COLLATE NOCASE",
+                (f"%{descripcion}%",),
+            )
+            producto = self.cursor.fetchall()
+        except Exception as e:
+            print(f"Error al obtener los productos, descripcion: \n {e}")
 
         return producto

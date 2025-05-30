@@ -34,6 +34,7 @@ from flet import (
     DataCell,
     RoundedRectangleBorder,
     SnackBarBehavior,
+    ListView,
 )
 from views.view_login import ViewLogin
 from views.view_caja import ViewCaja
@@ -153,7 +154,7 @@ def main(page: Page):
             ViewLogin.tf_contrasena.error_text = "Contraseña incorrecta"
         page.update()
 
-    ##Funciones de ViewCaja
+    ##Funciones de ViewCaja----------------------------------------------------------------------------------------
     def on_item_agregar_todo(e):
         page.open(ViewCaja.ad_cuenta_corriente)
         page.update()
@@ -163,8 +164,7 @@ def main(page: Page):
         page.update()
 
     def on_producto_seleccionado(e):
-        # print(e.control.selected_index)
-        print(e.selection.value)
+        pass
 
     ##Funciones de ViewProductos-----------------------------------------------------------------------------------
     def on_seleccionar_fila_producto(e):
@@ -347,15 +347,24 @@ def main(page: Page):
         page.update()
 
     def on_cerrar_agregar_producto(e):
+        ControllerCombo.limpiar_variables()
         page.close(ViewCombos.ad_seleccionar_productos)
+
+    def on_producto_seleccionado_combo(e):
+        ControllerCombo.action_producto_seleccionado(e.selection.value)
+
+    def on_cambiar_cantidad(e):
+        ControllerCombo.action_cambiar_cantidad(e.control.value)
         page.update()
 
-    def on_producto_seleccionado(e):
-        producto = ControllerCombo.action_producto_seleccionado(e.selection.value)
+    def on_buscar_producto(e):
 
-        print(producto[0])
-        # print(producto[1])
-        # print(producto[5])
+        if e.data:
+            ControllerCombo.action_buscar_producto(e.data)
+            ViewCombos.sb_buscar_producto.open_view()
+        else:
+            ViewCombos.sb_buscar_producto.close_view()
+        page.update()
 
     ##Funciones de ViewCuentaCorriente----------------------------------------------------------------
     def on_ver_estado_cuenta(e):
@@ -552,7 +561,10 @@ def main(page: Page):
     ViewCombos.ebtn_ver_combos.on_click = on_ver_combos
     ViewCombos.ebtn_agregar_producto.on_click = on_agregar_producto
     ViewCombos.ibtn_cerrar_seleccionar_productos.on_click = on_cerrar_agregar_producto
-    ViewCombos.ac_buscar_producto.on_select = on_producto_seleccionado
+    # ViewCombos.ac_buscar_producto.on_select = on_producto_seleccionado_combo
+    ViewCombos.tf_cantidad_producto.on_change = on_cambiar_cantidad
+    ViewCombos.sb_buscar_producto.on_change = on_buscar_producto
+    # ViewCombos.sb_buscar_producto.on_tap = on_tap
 
     # Eventos de ViewCuentaCorriente
     ViewCuentaCorriente.ebtn_ver_estado_cuenta.on_click = on_ver_estado_cuenta
@@ -636,16 +648,3 @@ app(target=main)
 
 
 # Para obtener el tema del sistema operativo windows
-"""
-def obtener_tema_sistema_operativo():
-        if os.name == "nt":  # Windows
-            try:
-                clave = winreg.OpenKey(
-                    winreg.HKEY_CURRENT_USER,
-                    r"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
-                )
-                valor = winreg.QueryValueEx(clave, "AppsUseLightTheme")
-                return "Claro" if valor == 1 else "Oscuro"
-            except FileNotFoundError:
-                return "No se pudo determinar el tema
-"""

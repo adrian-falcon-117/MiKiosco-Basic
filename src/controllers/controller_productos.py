@@ -20,7 +20,9 @@ class ControllerProductos:
     # Coneccion con model
     @classmethod
     def obtener_productos(self):
+        #print(my_model.get_producto())
         return my_model.get_producto()
+        
 
     # Hace las comprobaciones antes de agregar un nuevo producto
     @classmethod

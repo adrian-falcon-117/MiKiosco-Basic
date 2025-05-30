@@ -24,6 +24,9 @@ from flet import (
     padding,
     AlertDialog,
     AutoComplete,
+    SearchBar,
+    ListView,
+    RoundedRectangleBorder,
 )
 
 from controllers.controller_combos import ControllerCombo as my_controller
@@ -64,11 +67,19 @@ class ViewCombos(Container):
     obtn_eliminar_combo = OutlinedButton(text="Eliminar", icon=Icons.DELETE_OUTLINE)
 
     ###Controles de Dialog seleccionar producto
+    lv_productos = ListView()
+    sb_buscar_producto = SearchBar(
+        bar_hint_text="Buscar un producto",
+        view_hint_text="Selecciona un color de las sugerencias",
+        view_shape=RoundedRectangleBorder(radius=5),
+        bar_shape=RoundedRectangleBorder(radius=5),
+        controls=[lv_productos],
+    )
     ac_buscar_producto = AutoComplete(
         suggestions=my_controller.resultado_burqueda_producto()
     )
     tf_cantidad_producto = TextField(label="Cantidad", width=100)
-    txt_subtotal = Text(value="Subtotal: $999999")
+    txt_subtotal = Text(value="Subtotal: $0")
     ebtn_agregar = ElevatedButton(text="Agregar")
     ibtn_cerrar_seleccionar_productos = IconButton(
         tooltip="Cancelar", icon=Icons.CLOSE_ROUNDED
@@ -257,7 +268,7 @@ class ViewCombos(Container):
                     Row(
                         expand=True,
                         controls=[
-                            Container(height=50, width=200, content=ac_buscar_producto),
+                            Container(height=50, width=200, content=sb_buscar_producto),
                             tf_cantidad_producto,
                             txt_subtotal,
                         ],

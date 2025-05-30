@@ -108,7 +108,7 @@ class ViewMovimientoCaja(Container):
     )
     eplist_movimientos_caja = ExpansionPanelList(
         expand=True,
-        #divider_color=color_divider,
+        # divider_color=color_divider,
         controls=my_controller.list_ep_movimiento(),
     )
 
@@ -239,17 +239,26 @@ class ViewMovimientoCaja(Container):
     def __init__(self):
         super().__init__()
         self.expand = True
-        #self.bgcolor = self.color_black26
-        #self.border_radius = 5
-        #self.padding = 5
+        # self.bgcolor = self.color_black26
+        # self.border_radius = 5
+        # self.padding = 5
         self.content = Column(
             expand=True,
             controls=[
-                self.mb_movimietos_caja,
                 Column(
                     expand=True,
                     scroll=ScrollMode.AUTO,
                     controls=[self.eplist_movimientos_caja],
+                ),
+                Container(
+                    bgcolor=self.color_black26,
+                    border_radius=5,
+                    padding=5,
+                    content=Row(
+                        alignment=MainAxisAlignment.CENTER,
+                        expand=True,
+                        controls=[self.mb_movimietos_caja],
+                    ),
                 ),
             ],
         )
