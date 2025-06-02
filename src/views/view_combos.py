@@ -58,6 +58,8 @@ class ViewCombos(Container):
     ibtn_cerrar_agregar_producto = IconButton(icon=Icons.CLOSE)
 
     ebtn_ver_combos = ElevatedButton(text="Ver combos", icon=Icons.DISCOUNT_OUTLINED)
+    ebtn_editar_combo2 = ElevatedButton(text="Editar", icon=Icons.EDIT_OUTLINED)
+    obtn_quitar_combo = OutlinedButton(text="Quitar", icon=Icons.CANCEL_OUTLINED)
 
     ###Controles de Combos
     ebtn_crear_combo = ElevatedButton(
@@ -102,13 +104,15 @@ class ViewCombos(Container):
             ),
             DataColumn(
                 heading_row_alignment=MainAxisAlignment.START,
-                label=Text(value="Descripcion"),
+                label=Text(value="Producto"),
             ),
             DataColumn(
+                numeric=True,
                 label=Text(value="Cantidad"),
                 heading_row_alignment=MainAxisAlignment.START,
             ),
             DataColumn(
+                numeric=True,
                 label=Text(value="Subtotal"),
                 heading_row_alignment=MainAxisAlignment.START,
             ),
@@ -179,9 +183,11 @@ class ViewCombos(Container):
                             padding=5,
                             content=Row(
                                 alignment=MainAxisAlignment.CENTER,
+                                height=40,
                                 expand=True,
                                 controls=[
                                     ebtn_crear_combo,
+                                    ver_divider,
                                     ebtn_editar_combo,
                                     obtn_eliminar_combo,
                                 ],
@@ -203,7 +209,7 @@ class ViewCombos(Container):
             controls=[
                 Row(
                     controls=[
-                        Icon(name=Icons.DISCOUNT_OUTLINED),
+                        Icon(name=Icons.ADD_CIRCLE_OUTLINE_OUTLINED),
                         Text(value="Crear combos"),
                     ]
                 ),
@@ -235,8 +241,12 @@ class ViewCombos(Container):
                 ),
                 Row(
                     alignment=MainAxisAlignment.CENTER,
+                    height=40,
                     controls=[
                         ebtn_ver_combos,
+                        ver_divider,
+                        ebtn_editar_combo2,
+                        obtn_quitar_combo,
                     ],
                 ),
             ],
