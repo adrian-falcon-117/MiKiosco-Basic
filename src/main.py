@@ -371,34 +371,35 @@ def main(page: Page):
             ControllerCombo.action_cambiar_cantidad(0)
         page.update()
 
-    # Modificar para que ni se pueda guardar si falta cantidad
+    # Seguir aqui
     def get_all_productos_combo():
         l_row = []
+        total = 0
         for i in ControllerCombo.action_obtener_combo():
-            print(i[0])
-            if i[0]:
-                l_row.append(
-                    DataRow(
-                        on_select_changed=on_seleccionar_fila_producto,
-                        data=i[0],
-                        cells=[
-                            DataCell(content=Text(value=i[0])),
-                            DataCell(content=Text(value=i[1])),
-                            DataCell(content=Text(value=i[2])),
-                            DataCell(content=Text(value=i[3])),
-                        ],
-                    ),
-                )
-                ViewCombos.dt_combos.rows = l_row
-            else:
-                mensaje("Falta información")
-                continue
+            total += i[3]  # Suma el subtotal de la tabla
+            l_row.append(
+                DataRow(
+                    # on_select_changed=on_seleccionar_fila_producto,
+                    data=i[0],
+                    cells=[
+                        DataCell(content=Text(value=i[0])),
+                        DataCell(content=Text(value=i[1])),
+                        DataCell(content=Text(value=i[2])),
+                        DataCell(content=Text(value=i[3])),
+                    ],
+                ),
+            )
+        ControllerCombo.sumar_total(total)
+        ViewCombos.dt_combos.rows = l_row
+        # page.update()
 
     def on_agregar_producto_combo(e):
-        # print(ControllerCombo.obtener_combo())
         get_all_productos_combo()
         on_cerrar_agregar_producto(e)
         page.update()
+
+    def on_guardar_combo(e):
+        pass
 
     ##Funciones de ViewCuentaCorriente----------------------------------------------------------------
     def on_ver_estado_cuenta(e):
@@ -599,6 +600,7 @@ def main(page: Page):
     ViewCombos.tf_cantidad_producto.on_change = on_cambiar_cantidad
     ViewCombos.sb_buscar_producto.on_change = on_buscar_producto_combo
     ViewCombos.ebtn_agregar.on_click = on_agregar_producto_combo
+    ViewCombos.ebtn_guardar_combo = on_guardar_combo
 
     # Eventos de ViewCuentaCorriente
     ViewCuentaCorriente.ebtn_ver_estado_cuenta.on_click = on_ver_estado_cuenta

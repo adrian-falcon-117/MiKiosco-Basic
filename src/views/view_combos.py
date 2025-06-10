@@ -86,6 +86,7 @@ class ViewCombos(Container):
     ibtn_cerrar_seleccionar_productos = IconButton(
         tooltip="Cancelar", icon=Icons.CLOSE_ROUNDED
     )
+    txt_mensaje_alerta = Text(color=Colors.RED)
 
     dt_combos = DataTable(
         show_checkbox_column=True,
@@ -284,6 +285,7 @@ class ViewCombos(Container):
                         ],
                     ),
                     Row(alignment=MainAxisAlignment.CENTER, controls=[ebtn_agregar]),
+                    txt_mensaje_alerta,
                 ],
             ),
         ),

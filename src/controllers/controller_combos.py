@@ -13,6 +13,8 @@ class ControllerCombo:
     subtotal = None
     producto_combo = []
 
+    total_combo = 0
+
     @classmethod
     def resultado_burqueda_producto(self):
         lista_producto = []
@@ -79,22 +81,41 @@ class ControllerCombo:
 
     @classmethod
     def action_obtener_combo(self):
-        self.producto_combo.append(
-            (
-                self.id_producto,
-                self.descripcion_producto,
-                self.cantidad,
-                self.subtotal,
+        if self.id_producto and self.descripcion_producto and self.cantidad:
+            self.producto_combo.append(
+                (
+                    self.id_producto,
+                    self.descripcion_producto,
+                    self.cantidad,
+                    self.subtotal,
+                )
             )
-        )
         return self.producto_combo
+
+    def action_agregar_producto_combo(self):
+        v = my_view.ViewCombos()
+        if not self.id_producto:
+            pass
+
+    def action_guardar_combo(self):
+        v = my_view.ViewCombos()
+        nombre_combo = v.tf_nombre_combo.value
+
+    @classmethod
+    def sumar_total(self, total):
+        v = my_view.ViewCombos()
+        self.total_combo = total
+        print(f"Total: {self.total_combo}")
+        v.tf_total_combo.value = self.total_combo
 
     @classmethod
     def limpiar_variables(self):
+        v = my_view.ViewCombos()
         self.precio_producto = 1
         self.id_producto = None
         self.descripcion_producto = None
         self.cantidad = None
         self.subtotal = None
+        v.txt_mensaje_alerta.value = ""
 
         # return Text(value=producto[0])
