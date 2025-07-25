@@ -4,37 +4,22 @@ from flet import (
     Page,
     Icons,
     TabAlignment,
-    AppView,
     app,
     padding,
     Theme,
-    Colors,
     AlertDialog,
     Text,
-    TextField,
-    Dropdown,
     ElevatedButton,
     OutlinedButton,
-    Divider,
-    CircleAvatar,
-    Icon,
-    icons,
-    Column,
     Row,
     MainAxisAlignment,
-    CrossAxisAlignment,
     ColorScheme,
     DividerTheme,
-    ScrollbarTheme,
-    IconTheme,
-    ElevatedButtonTheme,
-    OutlinedButtonTheme,
     SnackBar,
     DataRow,
     DataCell,
     RoundedRectangleBorder,
     SnackBarBehavior,
-    ListView,
 )
 from views.view_login import ViewLogin
 from views.view_caja import ViewCaja
@@ -332,10 +317,8 @@ def main(page: Page):
         page.update()
 
     ##Funciones de ViewCombos------------------------------------------------------------------------
-    def on_crear_combo(e):
-        ViewCombos.cont_crear_combos.visible = True
-        ViewCombos.cont_combos.visible = False
-        page.update()
+    '''
+    
 
     def on_ver_combos(e):
         ViewCombos.cont_crear_combos.visible = False
@@ -348,9 +331,6 @@ def main(page: Page):
 
     def on_cerrar_agregar_producto(e):
         ControllerCombo.limpiar_variables()
-        ViewCombos.tf_cantidad_producto.value = ""
-        ViewCombos.sb_buscar_producto.value = ""
-        ViewCombos.txt_subtotal.value = "Subtotal: $0"
         page.close(ViewCombos.ad_seleccionar_productos)
 
     def on_producto_seleccionado_combo(e):
@@ -359,7 +339,7 @@ def main(page: Page):
     def on_cambiar_cantidad(e):
         ControllerCombo.action_cambiar_cantidad(e.control.value)
         page.update()
-
+        
     def on_buscar_producto_combo(e):
 
         if e.data:
@@ -371,7 +351,6 @@ def main(page: Page):
             ControllerCombo.action_cambiar_cantidad(0)
         page.update()
 
-    # Seguir aqui
     def get_all_productos_combo():
         l_row = []
         total = 0
@@ -389,10 +368,12 @@ def main(page: Page):
                     ],
                 ),
             )
-        ControllerCombo.sumar_total(total)
+        ControllerCombo.total_combo(total)
+        ControllerCombo.action_precio_combo(total)
         ViewCombos.dt_combos.rows = l_row
         # page.update()
 
+    # Arreglar aca el botom de agregar al combo
     def on_agregar_producto_combo(e):
         get_all_productos_combo()
         on_cerrar_agregar_producto(e)
@@ -400,6 +381,16 @@ def main(page: Page):
 
     def on_guardar_combo(e):
         pass
+
+    def on_precio_combo(e):
+        ControllerCombo.action_precio_combo(e.control.value)
+        page.update()
+
+    def on_descuento_combo(e):
+        ControllerCombo.action_descuento_combo(e.control.value)
+        page.update()
+    '''
+
 
     ##Funciones de ViewCuentaCorriente----------------------------------------------------------------
     def on_ver_estado_cuenta(e):
@@ -590,17 +581,22 @@ def main(page: Page):
     ViewProducto.tf_precio_venta.on_change = on_validar_precio_venta
     ViewProducto.tf_cantidad.on_change = on_validar_cantidad
     ViewProducto.ibtn_cancelar_producto.on_click = on_cancelar_producto
+    
 
     # Eventos de ViewCombos
+    '''
     ViewCombos.ebtn_crear_combo.on_click = on_crear_combo
     ViewCombos.ebtn_ver_combos.on_click = on_ver_combos
     ViewCombos.ebtn_agregar_producto.on_click = on_agregar_producto
     ViewCombos.ibtn_cerrar_seleccionar_productos.on_click = on_cerrar_agregar_producto
     # ViewCombos.ac_buscar_producto.on_select = on_producto_seleccionado_combo
     ViewCombos.tf_cantidad_producto.on_change = on_cambiar_cantidad
-    ViewCombos.sb_buscar_producto.on_change = on_buscar_producto_combo
+   # ViewCombos.sb_buscar_producto.on_change = on_buscar_producto_combo
     ViewCombos.ebtn_agregar.on_click = on_agregar_producto_combo
     ViewCombos.ebtn_guardar_combo = on_guardar_combo
+    ViewCombos.tf_precio_combo.on_change = on_precio_combo
+    ViewCombos.tf_descuento_combo.on_change = on_descuento_combo
+    '''
 
     # Eventos de ViewCuentaCorriente
     ViewCuentaCorriente.ebtn_ver_estado_cuenta.on_click = on_ver_estado_cuenta
@@ -657,7 +653,7 @@ def main(page: Page):
             Tab(
                 icon=Icons.LOCAL_OFFER_ROUNDED, text="Productos", content=ViewProducto()
             ),
-            Tab(icon=Icons.DISCOUNT, text="Combos", content=ViewCombos()),
+            Tab(icon=Icons.DISCOUNT, text="Combos", content=ViewCombos(page)),
             Tab(icon=Icons.ATTACH_MONEY_OUTLINED, text="Ventas", content=ViewVentas()),
             Tab(
                 icon=Icons.ACCOUNT_BALANCE_ROUNDED,
@@ -671,6 +667,7 @@ def main(page: Page):
             ),
         ],
     )
+    
 
     tema()
     color()
