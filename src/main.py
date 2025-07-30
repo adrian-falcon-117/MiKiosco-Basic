@@ -33,7 +33,7 @@ from views.view_configuracion import ViewConfiguracion
 from controllers.controller_caja import ControllerCaja
 from controllers.controller_productos import ControllerProductos
 from controllers.controller_configuracion import ControllerConfiguracion
-from controllers.controller_combos import ControllerCombo
+#from controllers.controller_combos import ControllerCombo
 
 # import os
 # import winreg
@@ -318,21 +318,6 @@ def main(page: Page):
 
     ##Funciones de ViewCombos------------------------------------------------------------------------
     '''
-    
-
-    def on_ver_combos(e):
-        ViewCombos.cont_crear_combos.visible = False
-        ViewCombos.cont_combos.visible = True
-        page.update()
-
-    def on_agregar_producto(e):
-        page.open(ViewCombos.ad_seleccionar_productos)
-        page.update()
-
-    def on_cerrar_agregar_producto(e):
-        ControllerCombo.limpiar_variables()
-        page.close(ViewCombos.ad_seleccionar_productos)
-
     def on_producto_seleccionado_combo(e):
         ControllerCombo.action_producto_seleccionado(e.selection.value)
 
@@ -387,7 +372,7 @@ def main(page: Page):
         page.update()
 
     def on_descuento_combo(e):
-        ControllerCombo.action_descuento_combo(e.control.value)
+        ControllerCombo.action_descuento_combo(e.control.value)w
         page.update()
     '''
 

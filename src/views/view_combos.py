@@ -38,54 +38,11 @@ class ViewCombos(Container):
         super().__init__()
         self.page = page
         self.controller = ControllerCombo(page, self)
-
-        self.lv_productos = ListView()
-        self.sb_buscar_producto = SearchBar(
-            expand=True,
-            bar_hint_text="Buscar un producto",
-            view_hint_text="Selecciona un color de las sugerencias",
-            view_shape=RoundedRectangleBorder(radius=5),
-            bar_shape=RoundedRectangleBorder(radius=5),
-            controls=[self.lv_productos],
-            on_change=self.controller.action_buscar_producto,
-        )
         self.expand = True
 
         self.color_black26 = Colors.BLACK26
         self.hor_divider = Divider()
         self.ver_divider = VerticalDivider()
-
-        ###Controles de Crear Combos
-        self.tf_nombre_combo = TextField(label="Nombre del combo")
-        self.tf_descuento_combo = TextField(
-            label="Descuento general",
-            suffix_icon=Icons.PERCENT_ROUNDED,
-            expand=True,
-        )
-        self.tf_precio_combo = TextField(
-            prefix_icon=Icons.ATTACH_MONEY_OUTLINED,
-            label="Precio del combo",
-        )
-        self.ebtn_agregar_producto = ElevatedButton(
-            text="Agregar producto", icon=Icons.ADD_CIRCLE_OUTLINE
-        )
-        self.ebtn_guardar_combo = ElevatedButton(
-            text="Guardar", icon=Icons.SAVE_OUTLINED
-        )
-        self.ibtn_cancelar_combo = IconButton(
-            tooltip="Cancelar", icon=Icons.CLOSE_ROUNDED
-        )
-        self.ibtn_cerrar_agregar_producto = IconButton(icon=Icons.CLOSE)
-
-        self.ebtn_ver_combos = ElevatedButton(
-            text="Ver combos", icon=Icons.DISCOUNT_OUTLINED
-        )
-        self.ebtn_editar_combo2 = ElevatedButton(
-            text="Editar", icon=Icons.EDIT_OUTLINED
-        )
-        self.obtn_quitar_combo = OutlinedButton(
-            text="Quitar", icon=Icons.CANCEL_OUTLINED
-        )
 
         ###Controles de Combos
         self.ebtn_crear_combo = ElevatedButton(
@@ -97,17 +54,86 @@ class ViewCombos(Container):
         self.obtn_eliminar_combo = OutlinedButton(
             text="Eliminar", icon=Icons.DELETE_OUTLINE
         )
+
+        ###Controles de Crear Combos
+
+        self.txt_precio_combo = Text(value="Precio: $...", size=20)
         self.txt_total_combo = Text(value="Total: $...")
+        # Campos de texto
+        self.tf_nombre_combo = TextField(label="Nombre del combo")
+        self.tf_descuento_combo = TextField(
+            label="Descuento",
+            suffix_icon=Icons.PERCENT_ROUNDED,
+            width=150,
+            on_change=self.controller.on_descuento_combo,
+            on_blur=self.controller.on_blur_descuento_combo,
+        )
+        self.tf_precio_combo = TextField(
+            prefix_icon=Icons.ATTACH_MONEY_OUTLINED,
+            label="Precio",
+            width=150,
+            on_change=self.controller.on_precio_combo,
+        )
+        # Botones
+        self.ebtn_agregar_producto = ElevatedButton(
+            text="Agregar producto",
+            icon=Icons.ADD_CIRCLE_OUTLINE,
+            on_click=self.controller.on_agregar_producto,
+        )
+
+        self.ebtn_guardar_combo = ElevatedButton(
+            text="Guardar",
+            icon=Icons.SAVE_OUTLINED,
+            on_click=self.controller.on_guardar_combo,
+        )
+        self.ibtn_cancelar_combo = IconButton(
+            tooltip="Cancelar", icon=Icons.CLOSE_ROUNDED, on_click=self.controller.on_cancelar_combo
+        )
+
+        self.ebtn_ver_combos = ElevatedButton(
+            text="Ver combos",
+            icon=Icons.DISCOUNT_OUTLINED,
+            on_click=self.controller.on_ver_combos,
+        )
+        self.ebtn_editar_combo2 = ElevatedButton(
+            text="Editar", icon=Icons.EDIT_OUTLINED
+        )
+        self.obtn_quitar_combo = OutlinedButton(
+            text="Quitar",
+            icon=Icons.CANCEL_OUTLINED,
+            disabled=True,
+            on_click=self.controller.on_quitar_combo,
+        )
 
         ###Controles de Dialog seleccionar producto
 
+        self.lv_productos = ListView()
+        self.sb_buscar_producto = SearchBar(
+            expand=True,
+            bar_hint_text="Buscar un producto",
+            view_hint_text="Seleccione un producto",
+            view_shape=RoundedRectangleBorder(radius=5),
+            bar_shape=RoundedRectangleBorder(radius=5),
+            controls=[self.lv_productos],
+            on_change=self.controller.on_buscar_producto,
+        )
+
         self.tf_cantidad_producto = TextField(
-            label="Cantidad", width=100, disabled=True
+            label="Cantidad",
+            width=150,
+            disabled=True,
+            on_change=self.controller.on_cambiar_cantidad,  # on_cantidad_producto,
         )
         self.txt_subtotal = Text(value="Subtotal: $0")
-        self.ebtn_agregar = ElevatedButton(text="Agregar producto", disabled=True)
-        self.ibtn_cerrar_seleccionar_productos = IconButton(
-            tooltip="Cancelar", icon=Icons.CLOSE_ROUNDED
+        self.ebtn_agregar_producto_combo = ElevatedButton(
+            text="Agregar producto",
+            disabled=True,
+            on_click=self.controller.on_agregar_producto_combo,
+        )
+        self.ibtn_cerrar_agregar_productos = IconButton(
+            tooltip="Cancelar",
+            icon=Icons.CLOSE,
+            on_click=self.controller.on_cerrar_agregar_producto,
         )
         self.txt_mensaje_alerta = Text(color=Colors.RED)
 
@@ -249,8 +275,9 @@ class ViewCombos(Container):
                                 expand=True,
                                 controls=[
                                     self.tf_nombre_combo,
-                                    # tf_descuento_combo,
-                                    self.tf_precio_combo,
+                                    self.tf_descuento_combo,
+                                    # self.tf_precio_combo,
+                                    self.txt_precio_combo,
                                     self.ebtn_agregar_producto,
                                 ],
                             ),
@@ -280,7 +307,7 @@ class ViewCombos(Container):
                         controls=[
                             self.ebtn_ver_combos,
                             self.ver_divider,
-                            self.ebtn_editar_combo2,
+                            # self.ebtn_editar_combo2,
                             self.obtn_quitar_combo,
                         ],
                     ),
@@ -311,7 +338,7 @@ class ViewCombos(Container):
                                         ),
                                         Row(
                                             controls=[
-                                                self.ibtn_cerrar_seleccionar_productos
+                                                self.ibtn_cerrar_agregar_productos
                                             ]
                                         ),
                                     ],
@@ -322,7 +349,6 @@ class ViewCombos(Container):
                         Row(
                             expand=True,
                             controls=[
-                                # TODO segir aqui
                                 self.sb_buscar_producto,
                                 self.tf_cantidad_producto,
                                 self.txt_subtotal,
@@ -330,7 +356,7 @@ class ViewCombos(Container):
                         ),
                         Row(
                             alignment=MainAxisAlignment.CENTER,
-                            controls=[self.ebtn_agregar],
+                            controls=[self.ebtn_agregar_producto_combo],
                         ),
                         # txt_mensaje_alerta,
                     ],
