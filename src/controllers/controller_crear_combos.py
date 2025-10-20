@@ -12,7 +12,7 @@ from model.model_combos import ModelCombos
 from views.mensaje import Mensaje
 
 
-class ControllerCombo(Container):
+class ControllerCrearCombo(Container):
 
     def __init__(self, page, view):
         super().__init__()
@@ -34,19 +34,6 @@ class ControllerCombo(Container):
     descuento = 0
     nombre_combo = None
 
-    # Activa el contenedor Crear combo
-    def on_crear_combo(self, e):
-        self.view.cont_crear_combos.visible = True
-        self.view.cont_combos.visible = False
-        self.page.update()
-
-    # Activa el contenedor Ver combos
-    def on_ver_combos(self, e):
-        self.view.cont_crear_combos.visible = False
-        self.view.cont_combos.visible = True
-        self.view.ebtn_ver_combos.data
-        self.page.update()
-
     # Abre el Cuadro de dialogo para Buscar un producto
     def on_agregar_producto(self, e):
         self.page.open(self.view.ad_seleccionar_productos)
@@ -57,22 +44,6 @@ class ControllerCombo(Container):
         self.view.sb_buscar_producto.value = ""
         self.page.close(self.view.ad_seleccionar_productos)
 
-    def on_cambiar_cantidad(self, e):
-        self.view.tf_cantidad_producto.error_text = None
-        try:
-            self.cantidad = int(e.control.value)
-            self.subtotal = int(self.precio_producto) * self.cantidad
-            self.view.txt_subtotal.value = f"Subtotal: ${self.subtotal}"
-            self.view.ebtn_agregar_producto_combo.disabled = False
-
-        except ValueError:
-            self.view.tf_cantidad_producto.value = None
-            self.view.tf_cantidad_producto.error_text = "Ingrese solo números"
-            self.view.txt_subtotal.value = "Subtotal: $0"
-            self.view.ebtn_agregar_producto_combo.disabled = True
-
-        self.page.update()
-
     # Cuando se selecciona un item de la lista de sugerencias
     def on_seleccionar_producto(self, e):
         self.id_producto = e.control.data
@@ -80,9 +51,7 @@ class ControllerCombo(Container):
         self.precio_producto = e.control.key
 
         self.view.tf_cantidad_producto.disabled = False
-
         self.view.sb_buscar_producto.close_view(e.control.title.value)
-
         self.page.update()
 
     # Cuando se busca un producto les aparecera sugerencias que concidan con la busqueda
@@ -108,6 +77,24 @@ class ControllerCombo(Container):
 
         self.clear_all()
         self.view.ebtn_agregar_producto_combo.disabled = True
+        self.page.update()
+
+    # La cantidad de un producta a agregar a un combo
+    def on_cambiar_cantidad(self, e):
+        self.view.tf_cantidad_producto.error_text = None
+        try:
+            self.cantidad = int(e.control.value)
+            self.subtotal = int(self.precio_producto) * self.cantidad
+            self.view.txt_subtotal.value = f"Subtotal: ${self.subtotal}"
+            if self.cantidad > 0:
+                self.view.ebtn_agregar_producto_combo.disabled = False
+
+        except ValueError:
+            self.view.tf_cantidad_producto.value = None
+            self.view.tf_cantidad_producto.error_text = "Solo números"
+            self.view.txt_subtotal.value = "Subtotal: $0"
+            self.view.ebtn_agregar_producto_combo.disabled = True
+
         self.page.update()
 
     def obtener_combo(self):
@@ -149,16 +136,19 @@ class ControllerCombo(Container):
             self.id_producto = e.control.cells[0].content.value
         self.page.update()
 
+    # Agrega la informacion a la tabla
     def actualizar_datos(self, total, lista_producto):
         self.view.obtn_quitar_combo.disabled = True
         self.view.txt_total_combo.value = f"Total: ${total}"
         # self.view.tf_precio_combo.value = total
         self.view.dt_combos.rows = lista_producto
 
+    # Suma los precios de los productos para dar el total del combo
     def productos_del_combo(self):
         lista_producto = []
         total = 0
         for producto, i in self.producto_combo.items():
+            print(producto)
             total += i["precio"]
             lista_producto.append(
                 DataRow(
@@ -177,15 +167,20 @@ class ControllerCombo(Container):
         self.actualizar_datos(total, lista_producto)
         self.page.update()
 
-    def aplicar_descuento(self, total):
-        total = int(total - (total * self.descuento / 100))
+    def aplicar_descuento(self, valor):
+        total = int(valor - (valor * self.descuento / 100))
         self.view.txt_precio_combo.value = f"Precio: ${total}"
+        self.page.update()
 
+    # TODO Seguir aqui
     def on_descuento_combo(self, e):
-        self.view.tf_descuento_combo.error_text = ""
+        self.view.tf_descuento_combo.error_text = None
         try:
             self.descuento = int(e.control.value)
-            self.aplicar_descuento(self.precio_total)
+            if self.descuento:
+                self.aplicar_descuento(self.precio_total)
+            else:
+                self.view.tf_descuento_combo.error_text = "Ingresa descuento"
         except:
             self.view.tf_descuento_combo.error_text = "Solo números"
             self.view.tf_descuento_combo.value = ""
@@ -193,29 +188,41 @@ class ControllerCombo(Container):
         self.page.update()
 
     def on_blur_descuento_combo(self, e):
-        self.view.tf_descuento_combo.error_text = ""
+        # print(e)
+        self.view.tf_descuento_combo.error_text = None
         self.page.update()
 
+    # Cuando se quita un producto del combo
     def on_quitar_combo(self, e):
         del self.producto_combo[self.id_producto]
-
         self.productos_del_combo()
 
+    # Cuando se agrega un producto al combo
     def on_agregar_producto_combo(self, e):
         self.obtener_combo()
         self.productos_del_combo()
         self.on_cerrar_agregar_producto(e)
         self.page.update()
 
+    # Cuando se ingresa el nombre para el combo
+    def on_nombre_combo(self, e):
+        self.view.tf_nombre_combo.error_text = None
+        nombre = e.control.value
+        if nombre:
+            self.nombre_combo = nombre
+        else:
+            self.view.tf_nombre_combo.error_text = "Ingrese nombre"
+
+    # Caundo se guarda un combo
     def on_guardar_combo(self, e):
         nombre_combo = self.view.tf_nombre_combo.value
-        precio_combo = self.view.tf_precio_combo.value
+        # precio_combo = self.view.tf_precio_combo.value
 
-        if nombre_combo and precio_combo and self.producto_combo:
+        if self.nombre_combo and self.precio_total and self.producto_combo:
             for producto, i in self.producto_combo.items():
                 self.model.create(
                     nombre_combo,
-                    precio_combo,
+                    self.precio_total,
                     i["id"],
                     i["descripcion"],
                     i["cantidad"],
@@ -227,7 +234,7 @@ class ControllerCombo(Container):
 
     # Recetea las variables y campos de textos
     def on_cancelar_combo(self, e):
-        self.clear_all()
+        self.cancelar_combo()
         self.mensaje.mensaje(Icons.CANCEL_OUTLINED, "Cancelado")
         self.page.update()
 
@@ -242,8 +249,26 @@ class ControllerCombo(Container):
         self.descripcion_producto = None
         self.cantidad = None
         self.subtotal = None
-        self.view.txt_mensaje_alerta.value = ""
-        self.view.tf_descuento_combo = None
-        # self.precio_combo = 0
 
-        # return Text(value=producto[0])
+    # Elimina la informacion contenida en variables, diccionario y views
+    def cancelar_combo(self):
+        self.view.tf_nombre_combo.value = None
+        self.view.tf_nombre_combo.error_text = None
+        self.view.tf_descuento_combo.value = None
+        self.view.tf_descuento_combo.error_text = None
+        self.view.txt_precio_combo.value = "Precio: $..."
+        self.view.txt_total_combo.value = "Total: $..."
+        self.view.dt_combos.rows = None
+
+        self.id_producto = None
+        self.descripcion_producto = None
+        self.precio_producto = 0
+        self.cantidad = None
+        self.subtotal = None
+        self.producto_combo.clear()
+
+        self.precio_total = 0
+        self.precio_descuento = 0
+        self.descuento = 0
+        self.nombre_combo = None
+        self.page.update()

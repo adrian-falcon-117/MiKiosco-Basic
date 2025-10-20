@@ -20,11 +20,19 @@ from flet import (
     DataCell,
     RoundedRectangleBorder,
     SnackBarBehavior,
+    SegmentedButton,
+    Segment,
+    Icon,
+    Column,
+    Container,
+    CrossAxisAlignment,
+    Colors,
 )
 from views.view_login import ViewLogin
 from views.view_caja import ViewCaja
 from views.view_productos import ViewProducto
 from views.view_combos import ViewCombos
+from views.view_crear_combos import ViewCrearCombos
 from views.view_ventas import ViewVentas
 from views.view_cuenta_corriente import ViewCuentaCorriente
 from views.view_movimiento_caja import ViewMovimientoCaja
@@ -33,7 +41,10 @@ from views.view_configuracion import ViewConfiguracion
 from controllers.controller_caja import ControllerCaja
 from controllers.controller_productos import ControllerProductos
 from controllers.controller_configuracion import ControllerConfiguracion
-#from controllers.controller_combos import ControllerCombo
+
+# from controllers.controller_combos import ControllerCombo
+
+from views.mensaje import Mensaje
 
 # import os
 # import winreg
@@ -105,6 +116,15 @@ def main(page: Page):
     def cerrar_aplicacion(e):
         page.window.destroy()
 
+    def on_cambiar(e):
+        # print(e.data)
+        # cont_combo.content = None
+        if e.data == '["1"]':
+            cont_combo.content = ViewCombos(page)
+        else:
+            cont_combo.content = ViewCrearCombos(page)
+        page.update()
+
     # Dialogo cerrar aplicacon
     def on_abrir_dialog(e):
         if e.data == "close":
@@ -114,15 +134,6 @@ def main(page: Page):
         page.close(ad_cerrar)
 
     # Mensaje en la parte inferior
-    def mensaje(mensaje):
-        sbar = SnackBar(
-            behavior=SnackBarBehavior.FLOATING,
-            width=300,
-            shape=RoundedRectangleBorder(radius=5),
-            show_close_icon=True,
-            content=Text(value=mensaje),
-        )
-        page.open(sbar)
 
     ##Funciones de ViewLogin----------------------------------------------------------------
     def on_usuario(e):
@@ -134,7 +145,7 @@ def main(page: Page):
 
         if contrasena == ControllerConfiguracion.contrasena_usuario():
             page.close(ViewLogin.ad_login)
-            mensaje("Bienvenido")
+            sms.mensaje(Icons.PERSON_OUTLINE, "Bienvenido")
         else:
             ViewLogin.tf_contrasena.error_text = "Contraseña incorrecta"
         page.update()
@@ -152,172 +163,11 @@ def main(page: Page):
         pass
 
     ##Funciones de ViewProductos-----------------------------------------------------------------------------------
-    def on_seleccionar_fila_producto(e):
-        global id_producto, descripcion_producto, cantidad_producto, precio_compra_producto, recargo_producto, precio_venta_producto, estado_guardar_producto
-        ControllerProductos.action_cancelar_producto()
-        id_producto = None
-        descripcion_producto = None
-        cantidad_producto = None
-        precio_compra_producto = None
-        recargo_producto = None
-        precio_venta_producto = None
-        estado_guardar_producto = True
 
-        # Permite seleccionar solo una fila a la vez
-        if e.control.selected:
-            e.control.selected = False
-        else:
-            for i in range(len(ViewProducto.dt_productos.rows)):
-                ViewProducto.dt_productos.rows[i].selected = False
-            e.control.selected = True
-            # Obtiene los datos de la fila seleccionada
-            id_producto = int(e.control.cells[0].content.value)
-            descripcion_producto = e.control.cells[1].content.value
-            cantidad_producto = int(e.control.cells[2].content.value)
-            precio_compra_producto = int(e.control.cells[3].content.value)
-            recargo_producto = int(e.control.cells[4].content.value)
-            precio_venta_producto = int(e.control.cells[5].content.value)
-
-        page.update()
-
-    def get_all_productos():
-        l_row = []
-        for i in ControllerProductos.obtener_productos():
-            l_row.append(
-                DataRow(
-                    on_select_changed=on_seleccionar_fila_producto,
-                    data=i[0],
-                    cells=[
-                        DataCell(content=Text(value=i[0])),
-                        DataCell(content=Text(value=i[1])),
-                        DataCell(content=Text(value=i[2])),
-                        DataCell(content=Text(value=i[3])),
-                        DataCell(content=Text(value=i[4])),
-                        DataCell(content=Text(value=i[5])),
-                    ],
-                ),
-            )
-        return l_row
-
-    # Guarda o actualiza un producto
-    def on_guardar_producto(e):
-        global estado_guardar_producto, id_producto
-
-        if estado_guardar_producto:  # Guarda un nuevo producto
-            if ControllerProductos.action_guardar_producto():
-                # Actuliza la tabla y muestra un mensaje de guardado
-                ViewProducto.dt_productos.rows = get_all_productos()
-                mensaje("Guardado")
-            else:
-                mensaje("No se pudo guardar")
-
-        else:  # Actualiza un nuevo producto
-            if ControllerProductos.action_actualizar_producto(id_producto):
-                ViewProducto.dt_productos.rows = get_all_productos()
-                mensaje("Actualizado")
-                estado_guardar_producto = True
-                id_producto = None
-                ControllerProductos.action_cancelar_producto()
-            else:
-                mensaje("No se pudo Actualizar")
-        page.update()
-
-    def on_editar_producto(e):
-        global estado_guardar_producto, id_producto
-        if id_producto:
-            ControllerProductos.action_editar_producto(
-                descripcion_producto,
-                cantidad_producto,
-                precio_compra_producto,
-                recargo_producto,
-                precio_venta_producto,
-            )
-            estado_guardar_producto = False
-        else:
-            mensaje("Seleccione un producto")
-        page.update()
-
-        # Aplicaca el recargo al precio de venta
-
-    def on_aplicar_recargo(e):
-        ControllerProductos.action_validar_recargo()
-        ControllerProductos.recargo_aplicado(
-            ControllerProductos.action_recargo_aplicado()
-        )
-        page.update()
-
-    def on_validar_precio_compra(e):
-        ControllerProductos.action_validar_precio_compra()
-        ControllerProductos.recargo_aplicado(
-            ControllerProductos.action_recargo_aplicado()
-        )
-        page.update()
-
-    def on_validar_cantidad(e):
-        ControllerProductos.action_validar_cantidad()
-        page.update()
-
-    def on_validar_precio_venta(e):
-        ControllerProductos.action_validar_precio_venta()
-        page.update()
-
-    def on_ver_promociones(e):
-        global id_producto
-        ViewProducto.cont_productos.visible = False
-        ViewProducto.cont_combos.visible = True
-        ControllerProductos.action_cancelar_producto()
-        ViewProducto.dt_combos.rows = get_all_productos()
-        id_producto = None
-        page.update()
-
-    def on_ver_productos(e):
-        global id_producto
-        ViewProducto.cont_productos.visible = True
-        ViewProducto.cont_combos.visible = False
-        id_producto = None
-        page.update()
-
-    def on_cerrar_promocion(e):
-        page.close(ViewProducto.ad_crear_promocion)
-        page.update()
-
-    # Abrir o Cerrar Alert Dialog de ViewProducto para eliminar un producto de la lista
-    def on_eliminar(e):
-        global id_producto
-        if id_producto:
-            page.open(ViewProducto.ad_eliminar_producto)
-            page.update()
-        else:
-            mensaje("Seleccione un producto")
-
-    def on_si_eliminar(e):
-        global estado_guardar_producto, id_producto
-        if ControllerProductos.action_eliminar_producto(id_producto):
-            # Actualiza la tabla y muestra un mensaje de que se Elimino correctamente
-            page.close(ViewProducto.ad_eliminar_producto)
-            ViewProducto.dt_productos.rows = get_all_productos()
-            mensaje("Eliminado correctamente")
-            estado_guardar_producto = True
-            id_producto = None
-        else:
-            page.close(ViewProducto.ad_eliminar_producto)
-            mensaje("No se pudo eliminar")
-
-        page.update()
-
-    def on_no_eliminar(e):
-        page.close(ViewProducto.ad_eliminar_producto)
-        page.update()
-
-    def on_cancelar_producto(e):
-        global id_producto, estado_guardar_producto
-        id_producto = None
-        estado_guardar_producto = True
-        ControllerProductos.action_cancelar_producto()
-        page.update()
+    # Aplicaca el recargo al precio de venta
 
     ##Funciones de ViewCombos------------------------------------------------------------------------
-    '''
+    """
     def on_producto_seleccionado_combo(e):
         ControllerCombo.action_producto_seleccionado(e.selection.value)
 
@@ -374,8 +224,7 @@ def main(page: Page):
     def on_descuento_combo(e):
         ControllerCombo.action_descuento_combo(e.control.value)w
         page.update()
-    '''
-
+    """
 
     ##Funciones de ViewCuentaCorriente----------------------------------------------------------------
     def on_ver_estado_cuenta(e):
@@ -550,26 +399,8 @@ def main(page: Page):
     ViewCaja.ibtn_cerrar_cuenta_corriente.on_click = on_cerrar_caja_corriente
     ViewCaja.ac_buscar_producto.on_select = on_producto_seleccionado
 
-    # Eventos de ViewProducto
-    # ViewProducto.ebtn_ver_combos.on_click = on_ver_promociones
-    # ViewProducto.ebtn_ver_productos.on_click = on_ver_productos
-    # ViewProducto.ibtn_cerrar_combo.on_click = on_cerrar_promocion
-    ViewProducto.obtn_eliminar.on_click = on_eliminar
-    ViewProducto.obtn_no.on_click = on_no_eliminar
-    ViewProducto.ebtn_si.on_click = on_si_eliminar
-    ViewProducto.dt_productos.rows = get_all_productos()
-    # ViewProducto.dt_combos.rows = get_all_productos()
-    ViewProducto.ebtn_guardar_producto.on_click = on_guardar_producto
-    ViewProducto.ebtn_editar.on_click = on_editar_producto
-    ViewProducto.tf_recargo.on_change = on_aplicar_recargo
-    ViewProducto.tf_precio_compra.on_change = on_validar_precio_compra
-    ViewProducto.tf_precio_venta.on_change = on_validar_precio_venta
-    ViewProducto.tf_cantidad.on_change = on_validar_cantidad
-    ViewProducto.ibtn_cancelar_producto.on_click = on_cancelar_producto
-    
-
     # Eventos de ViewCombos
-    '''
+    """
     ViewCombos.ebtn_crear_combo.on_click = on_crear_combo
     ViewCombos.ebtn_ver_combos.on_click = on_ver_combos
     ViewCombos.ebtn_agregar_producto.on_click = on_agregar_producto
@@ -581,7 +412,7 @@ def main(page: Page):
     ViewCombos.ebtn_guardar_combo = on_guardar_combo
     ViewCombos.tf_precio_combo.on_change = on_precio_combo
     ViewCombos.tf_descuento_combo.on_change = on_descuento_combo
-    '''
+    """
 
     # Eventos de ViewCuentaCorriente
     ViewCuentaCorriente.ebtn_ver_estado_cuenta.on_click = on_ver_estado_cuenta
@@ -609,6 +440,7 @@ def main(page: Page):
     # Eventos de ViewLogin
     ViewLogin.ebtn_iniciar.on_click = on_login_ok
     ViewLogin.obtn_salir.on_click = cerrar_aplicacion
+    sms = Mensaje(page)
 
     # Controles de Main
     ebtn_si_cerrar = ElevatedButton(text="Si", on_click=cerrar_aplicacion)
@@ -622,6 +454,30 @@ def main(page: Page):
             controls=[ebtn_si_cerrar, obtn_no_cerrar],
         ),
     )
+
+    sb_combo = SegmentedButton(
+        width=300,
+        padding=2,
+        selected_icon=Icon(Icons.CHECK),
+        selected={"1"},
+        allow_multiple_selection=False,
+        on_change=on_cambiar,
+        segments=[
+            Segment(
+                value="1",
+                label=Text("Combos"),
+                icon=Icon(Icons.DISCOUNT_OUTLINED),
+            ),
+            Segment(
+                value="2",
+                label=Text("Crear combo"),
+                icon=Icon(Icons.ADD_CIRCLE_OUTLINE_OUTLINED),
+            ),
+        ],
+    )
+
+    cont_combo = Container(expand=True, content=ViewCombos(page))
+
     tabs = Tabs(
         padding=padding.only(left=10, top=0, right=10, bottom=0),
         tab_alignment=TabAlignment.CENTER,
@@ -636,9 +492,30 @@ def main(page: Page):
                 content=ViewMovimientoCaja(),
             ),
             Tab(
-                icon=Icons.LOCAL_OFFER_ROUNDED, text="Productos", content=ViewProducto()
+                icon=Icons.LOCAL_OFFER_ROUNDED,
+                text="Productos",
+                content=ViewProducto(page),
             ),
-            Tab(icon=Icons.DISCOUNT, text="Combos", content=ViewCombos(page)),
+            Tab(
+                icon=Icons.DISCOUNT,
+                text="Combos",
+                content=Column(
+                    horizontal_alignment=CrossAxisAlignment.CENTER,
+                    expand=True,
+                    controls=[
+                        Container(
+                            content=Row(
+                                controls=[sb_combo],
+                                alignment=MainAxisAlignment.CENTER,
+                                # height=40,
+                            ),
+                            border_radius=5,
+                            bgcolor=Colors.BLACK26,
+                        ),
+                        cont_combo,
+                    ],
+                ),
+            ),
             Tab(icon=Icons.ATTACH_MONEY_OUTLINED, text="Ventas", content=ViewVentas()),
             Tab(
                 icon=Icons.ACCOUNT_BALANCE_ROUNDED,
@@ -652,7 +529,6 @@ def main(page: Page):
             ),
         ],
     )
-    
 
     tema()
     color()

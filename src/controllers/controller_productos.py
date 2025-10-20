@@ -1,195 +1,297 @@
-from flet import Text, AutoCompleteSuggestion
-from views import view_productos as my_view
-from model.model_productos import ModelProductos as my_model
+from flet import (
+    Text,
+    Container,
+    DataRow,
+    DataCell,
+    Colors,
+    Icons,
+)
 
 
-class ControllerProductos:
+from model.model_productos import ModelProductos
+from views.mensaje import Mensaje
+
+
+class ControllerProductos(Container):
+
+    def __init__(self, page, view):
+        # super().__init__()
+        self.page = page
+        self.view = view
+        self.model = ModelProductos(self.page)
+        self.mensaje = Mensaje(self.page)
 
     id_productos = None
 
-    @classmethod
-    def action_ch_productos():
-        mv_instancia = my_view.ViewProducto()
+    datos = [None] * 6
+    datos_dt = [None] * 6
+    # id_producto = None
+    # descripcion_producto = None
+    # cantidad_producto = None
+    # precio_compra_producto = None
+    # recargo_producto = None
+    # precio_venta_producto = None
+    estado = True
 
-    @classmethod
-    def lista_contenedor_principal(self):
-        mv_instancia = my_view.ViewProducto()
-        lista = [Text(value="1"), Text(value="2")]
-        return lista
+    # Cuando se selecciona una fila de la tabla
+    def on_descripcion_ordenar(self, e):
+        # print(f"{e.column_index}, {e.ascending}"),
 
-    # Coneccion con model
-    @classmethod
-    def obtener_productos(self):
-        #print(my_model.get_producto())
-        return my_model.get_producto()
-        
-
-    # Hace las comprobaciones antes de agregar un nuevo producto
-    @classmethod
-    def action_guardar_producto(self):
-        v = my_view.ViewProducto()
-        descripcion = v.tf_descripcion.value
-        cantidad = v.tf_cantidad.value
-        precio_compra = v.tf_precio_compra.value
-        recargo = v.tf_recargo.value
-        precio_venta = v.tf_precio_venta.value
-
-        # Si los campos de texto no estan vacio
-        if descripcion and cantidad and precio_compra and precio_venta:
-            self.action_cancelar_producto()
-            return my_model.add_producto(
-                descripcion, cantidad, precio_compra, recargo, precio_venta
-            )
+        if not e.ascending:
+            self.view.dt_productos.rows = self.datos_tabla("ORDER BY descripcion ASC")
         else:
-            if not descripcion:
-                v.tf_descripcion.error_text = "Ingrese una descripcion"
-            if not cantidad:
-                v.tf_cantidad.error_text = "Ingrese una cantidad"
-            if not precio_compra:
-                v.tf_precio_compra.error_text = "Ingrese un precio"
-            if not precio_venta:
-                v.tf_precio_venta.error_text = "Ingrese un precio"
+            self.view.dt_productos.rows = self.datos_tabla("")
+        self.page.update()
 
-    # Valida los campos y actuliza la informacion
-    @classmethod
-    def action_actualizar_producto(self, id):
-        v = my_view.ViewProducto()
-        descripcion = v.tf_descripcion.value
-        cantidad = v.tf_cantidad.value
-        precio_compra = v.tf_precio_compra.value
-        recargo = v.tf_recargo.value
-        precio_venta = v.tf_precio_venta.value
+    def on_fila_seleccionada(self, e):
+        # self.cancelar()
 
-        # Si los campos de texto no estan vacio
-        if descripcion and cantidad and precio_compra and precio_venta:
-            self.action_cancelar_producto()
-            return my_model.update_producto(
-                descripcion,
-                cantidad,
-                precio_compra,
-                recargo,
-                precio_venta,
-                id,
-            )
+        # Permite seleccionar solo una fila a la vez
+        if e.control.selected:
+            e.control.selected = False
+            self.view.cont_botones_inferior.disabled = True
         else:
-            if not descripcion:
-                v.tf_descripcion.error_text = "Ingrese una descripcion"
-            if not cantidad:
-                v.tf_cantidad.error_text = "Ingrese una cantidad"
-            if not precio_compra:
-                v.tf_precio_compra.error_text = "Ingrese un precio"
-            if not precio_venta:
-                v.tf_precio_venta.error_text = "Ingrese un precio"
+            for i in range(len(self.view.dt_productos.rows)):
+                self.view.dt_productos.rows[i].selected = False
+            e.control.selected = True
+            self.view.cont_botones_inferior.disabled = False
+            # Obtiene los datos de la fila seleccionada
+            # print(e)
+            self.datos_dt[0] = int(e.control.cells[0].content.value)
+            self.datos_dt[1] = e.control.cells[1].content.value
+            self.datos_dt[2] = int(e.control.cells[2].content.value)
+            self.datos_dt[3] = int(e.control.cells[3].content.value)
+            self.datos_dt[4] = int(e.control.cells[4].content.value)
+            self.datos_dt[5] = int(e.control.cells[5].content.value)
+
+            # print(self.datos)
+        self.page.update()
+
+    def datos_fila(self, color, i):
+        dr = DataRow(
+            color=color,
+            on_select_changed=self.on_fila_seleccionada,
+            data=i[0],
+            cells=[
+                DataCell(content=Text(value=i[0])),
+                DataCell(content=Text(value=i[1])),
+                DataCell(content=Text(value=i[2])),
+                DataCell(content=Text(value=i[3])),
+                DataCell(content=Text(value=i[4])),
+                DataCell(content=Text(value=i[5])),
+            ],
+        )
+        return dr
+
+    def datos_tabla(self, txt):
+        l_row = []
+        for i in self.model.read(txt):
+            if i[2] <= 5:
+                l_row.append(self.datos_fila(Colors.RED_400, i))
+            else:
+                l_row.append(self.datos_fila(None, i))
+        return l_row
+
+    def comprobar_datos(self):
+        # Si los campos de texto no estan vacio
+        if (
+            self.datos[1] != None
+            and self.datos[2] != None
+            and self.datos[3] != None
+            and self.datos[4] != None
+            and self.datos[5] != None
+        ):
+            return True
+        else:
+            self.mensaje.mensaje(Icons.ERROR_OUTLINE, "Falta informacion")
+            return False
+
+    # -----------------------------------------------------------------------------------------
+    # Guarda o actualiza un producto
+    def on_guardar_producto(self, e):
+        # print(self.datos)
+        if self.estado and self.comprobar_datos():  # Guarda un nuevo producto
+            self.model.create(self.datos)
+            self.cancelar()
+            # Actuliza la tabla y muestra un mensaje de guardado
+        elif not self.estado and self.comprobar_datos():  # Actualiza un nuevo producto
+            self.model.update(self.datos)
+            self.cancelar()
+
+        self.view.dt_productos.rows = self.datos_tabla("")
+        self.page.update()
+
+    def on_editar_producto(self, e):
+        # self.page.open(self.view.ad_editar_producto)
+        # self.page.update()
+        self.datos = self.datos_dt.copy()
+        self.view.tf_descripcion.value = self.datos_dt[1]
+        self.view.tf_cantidad.value = self.datos_dt[2]
+        self.view.tf_precio_compra.value = self.datos_dt[3]
+        self.view.tf_recargo.value = self.datos_dt[4]
+        self.view.tf_precio_venta.value = self.datos_dt[5]
+        self.estado = False
+        self.view.cont_botones_inferior.disabled = True
+        self.page.update()
 
     # Elimina el producto selecionado
-    @classmethod
-    def action_eliminar_producto(self, id):
-        print(id)
-        self.action_cancelar_producto()
-        return my_model.delete_producto(id)
+    def on_si_eliminar(self, e):
+        # Actualiza la tabla y muestra un mensaje de que se Elimino correctamente
+        self.model.delete(self.datos_dt[0])
+        self.page.close(self.view.ad_eliminar_producto)
+        self.view.dt_productos.rows = self.datos_tabla("")
+        self.view.cont_botones_inferior.disabled = True
+        self.cancelar()
 
-    # Limpia los TextField
-    @classmethod
-    def action_cancelar_producto(self):
-        v = my_view.ViewProducto()
-        v.tf_descripcion.value = None
-        v.tf_cantidad.value = None
-        v.tf_precio_compra.value = None
-        v.tf_recargo.value = None
-        v.tf_precio_venta.value = None
+        self.page.update()
 
-        v.tf_descripcion.error_text = None
-        v.tf_cantidad.error_text = None
-        v.tf_precio_compra.error_text = None
-        v.tf_recargo.error_text = None
-        v.tf_precio_venta.error_text = None
+    def on_no_eliminar(self, e):
+        self.page.close(self.view.ad_eliminar_producto)
+        self.page.update()
 
-    # Realiza el incremento del precio de venta segun el recargo aplicado
-    @classmethod
-    def action_recargo_aplicado(self):
-        try:
-            incremento = self.action_validar_precio_compra() * (
-                self.action_validar_recargo() / 100
+    # Abrir o Cerrar Alert Dialog de ViewProducto para eliminar un producto de la lista
+    def on_eliminar(self, e):
+        if self.datos_dt[0] != self.datos[0]:
+            self.page.open(self.view.ad_eliminar_producto)
+        else:
+            self.mensaje.mensaje(
+                Icons.ERROR_OUTLINE, "No se puede eliminar en este momento"
             )
-            precio_venta = self.action_validar_precio_compra() + int(incremento)
+        self.page.update()
 
-            return precio_venta
+    # Cancela la operacion para guardar o editar un producto
+    def on_cancelar(self, e):
+        self.view.cont_producto.disabled = False
+        self.cancelar()
+        self.page.update()
+
+    # Limpia los TextField y variables
+    def cancelar(self):
+        for i in range(0, 5):
+            self.datos[i] = None
+
+        self.estado = True
+
+        self.view.tf_descripcion.value = None
+        self.view.tf_cantidad.value = None
+        self.view.tf_precio_compra.value = None
+        self.view.tf_recargo.value = None
+        self.view.tf_precio_venta.value = None
+
+        self.view.tf_descripcion.error_text = None
+        self.view.tf_cantidad.error_text = None
+        self.view.tf_precio_compra.error_text = None
+        self.view.tf_recargo.error_text = None
+        self.view.tf_precio_venta.error_text = None
+
+    # Se validan los Campos de texto----------------------------------------
+
+    def recargo(self):
+        try:
+            self.datos[5] = (self.datos[3] * self.datos[4]) / 100 + self.datos[3]
+            self.view.tf_precio_venta.value = int(self.datos[5])
         except TypeError:
-            return 0
+            pass
 
-    # Validan los Text Fiel para que solo se ingresen numeros
-    @classmethod
-    def action_validar_recargo(self):
-        v = my_view.ViewProducto()
+    def on_descripcion(self, e):
+        if e.control.value != "":
+            self.datos[1] = e.control.value
+        else:
+            self.view.tf_descripcion.error_text = "Falta descripcion"
+        self.page.update()
+
+    def on_cantidad(self, e):
+        self.view.tf_cantidad.error_text = None
         try:
-            recargo = int(v.tf_recargo.value)
-            v.tf_recargo.error_text = None
-            return recargo
+            if e.control.value != "":
+                self.datos[2] = int(e.control.value)
+            else:
+                self.view.tf_cantidad.error_text = "Falta cantidad"
         except ValueError:
-            v.tf_recargo.error_text = "Ingrese solo números"
-            v.tf_recargo.value = None
+            self.view.tf_cantidad.value = None
+            self.view.tf_cantidad.error_text = "Solo números"
+        self.page.update()
 
-    @classmethod
-    def action_validar_precio_compra(self):
-        v = my_view.ViewProducto()
+    def on_precio_compra(self, e):
+        self.view.tf_precio_compra.error_text = None
         try:
-            precio_compra = int(v.tf_precio_compra.value)
-            v.tf_precio_compra.error_text = None
-            return precio_compra
+            if e.control.value != "":
+                self.datos[3] = int(e.control.value)
+                self.recargo()
+            else:
+                self.view.tf_precio_compra.error_text = "Falta precio"
         except ValueError:
-            v.tf_precio_compra.error_text = "Ingrese solo números"
-            v.tf_precio_compra.value = None
+            self.view.tf_precio_compra.error_text = "Solo números"
+            self.view.tf_precio_compra.value = None
+        self.page.update()
 
-    @classmethod
-    def action_validar_precio_venta(self):
-        v = my_view.ViewProducto()
-        v.tf_recargo.value = 0
+    def on_recargo(self, e):
+        self.view.tf_recargo.error_text = None
         try:
-            precio_venta = int(v.tf_precio_venta.value)
-            v.tf_precio_venta.error_text = None
-            return precio_venta
+            if e.control.value != "":
+                self.datos[4] = int(e.control.value)
+                self.recargo()
+            else:
+                self.view.tf_recargo.error_text = "Falta recargo"
         except ValueError:
-            v.tf_precio_venta.error_text = "Ingrese solo números"
-            v.tf_precio_venta.value = None
+            self.view.tf_recargo.error_text = "Solo números"
+            self.view.tf_recargo.value = None
+        self.page.update()
 
-    @classmethod
-    def action_validar_cantidad(self):
-        v = my_view.ViewProducto()
+    def on_precio_venta(self, e):
+        self.view.tf_recargo.value = 0
+        self.view.tf_precio_venta.value = e.control.value
+        self.view.tf_precio_venta.error_text = None
         try:
-            cantidad = int(v.tf_cantidad.value)
-            v.tf_cantidad.error_text = None
-            return cantidad
+            if e.control.value != "":
+                self.datos[5] = int(e.control.value)
+            else:
+                self.view.tf_precio_venta.error_text = "Falta precio"
+
         except ValueError:
-            v.tf_cantidad.error_text = "Ingrese solo números"
-            v.tf_cantidad.value = None
+            self.view.tf_precio_venta.error_text = "Solo números"
+            self.view.tf_precio_venta.value = None
+        self.page.update()
 
-    # Aplica el recargo al precio de venta
-    @classmethod
-    def recargo_aplicado(self, recargo):
-        v = my_view.ViewProducto()
-        v.tf_precio_venta.value = recargo
-
-    @classmethod
-    def action_editar_producto(
-        self, descripcion, cantidad, precio_compra, recargo, precio_venta
-    ):
-        v = my_view.ViewProducto()
-
-        v.tf_descripcion.value = descripcion
-        v.tf_cantidad.value = cantidad
-        v.tf_precio_compra.value = precio_compra
-        v.tf_recargo.value = recargo
-        v.tf_precio_venta.value = precio_venta
-
-    # Lista de productos para la busqueda
-    @classmethod
-    def lista_resultado_productos(self):
-        lista = []
-        for i in self.productos:
-            lista.append(
-                AutoCompleteSuggestion(
-                    key=i,
-                    value=i,
-                )
+    def formatear_numeroo(self, numero):
+        try:
+            numero_float = float(numero)
+            return (
+                "{:,.2f}".format(numero_float)
+                .replace(",", "X")
+                .replace(".", ",")
+                .replace("X", ".")
             )
-        return lista
+        except ValueError:
+            return numero
+
+    # TODO Seguir aqui
+    def formatear_numero(self, entrada):
+        # Eliminar todo excepto dígitos y coma (solo una coma permitida)
+        limpio = ""
+        parte_decimal
+        coma_encontrada = False
+        for c in entrada:
+            if c.isdigit() or c == ",":
+                limpio += c
+
+        # Separar parte entera y decimal
+        if "," in entrada:
+            parte_entera, parte_decimal = limpio.split(",", 1)
+            print("Aqui:", parte_decimal)
+        else:
+            parte_entera, parte_decimal = limpio, ""
+
+        print(limpio)
+
+        # Formatear parte entera con puntos
+        parte_entera = parte_entera[::-1]
+        grupos = [parte_entera[i : i + 3] for i in range(0, len(parte_entera), 3)]
+        parte_entera_formateada = ".".join(grupos)[::-1]
+
+        # Reconstruir número
+        resultado = parte_entera_formateada
+        if parte_decimal:
+            resultado += "," + parte_decimal
+
+        return resultado

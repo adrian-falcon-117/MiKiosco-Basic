@@ -1,65 +1,85 @@
-import sqlite3 as sql3
+from model.model import Model
+from views.mensaje import Mensaje
 
 
-class ModelProductos:
+class ModelProductos(Model):
 
-    # Conexion a Base de Datos
-    try:
-        conexion = sql3.connect("src/storage/db/mi_db.db", check_same_thread=False)
-        cursor = conexion.cursor()
-    except Exception:
-        print(Exception)
+    def __init__(self, page):
+        self.page = page
+        self.mensaje = Mensaje(self.page)
+
+    # Obtine el id de un producto
+    def get_id_producto(self, descripcion):
+        try:
+            self.cursor.execute(
+                "SELECT id FROM productos WHERE descripcion = ?", (descripcion)
+            )
+            return self.cursor.fetchone()[0]
+
+        except Exception as ex:
+            self.mensaje.mensaje_error(f"Error de coneccion:{ex}")
 
     # Agregar datos
-    @classmethod
-    def add_producto(self, descripcion, cantidad, precio_compra, recargo, precio_venta):
+    def create(self, datos):
         try:
             self.cursor.execute(
                 "INSERT INTO productos (descripcion, cantidad, precio_compra, recargo, precio_venta) VALUES (?,?,?,?,?)",
-                (descripcion, cantidad, precio_compra, recargo, precio_venta),
+                (datos[1], datos[2], datos[3], datos[4], datos[5]),
             )
             self.conexion.commit()
-            return True
-        except Exception:
-            print("Error de conexion")
-            return False
+            self.mensaje.mensaje_ok("Guadado correctamente")
+        except Exception as ex:
+            self.mensaje.mensaje_error(f"No se pudo guardar, error: {ex}")
 
     # Obtener todos los productos
-    @classmethod
-    def get_producto(self):
+    def read(self, txt):
         try:
-            self.cursor.execute("SELECT * FROM productos")
-            usuarios = self.cursor.fetchall()
-        except Exception:
-            print("Error al obtener los productos")
+            self.cursor.execute(f"SELECT * FROM productos {txt}")
+            productos = self.cursor.fetchall()
+            # print(productos)
+            return productos
+        except Exception as ex:
+            self.mensaje.mensaje_error(f"No se pudo obtener, error: {ex}")
 
-        return usuarios
+    def read_asc(self):
+        try:
+            self.cursor.execute("SELECT * FROM productos ORDER BY descripcion ASC")
+            productos = self.cursor.fetchall()
+            # print(productos)
+            return productos
+        except Exception as ex:
+            print("Error aca", ex)
+            # self.mensaje.mensaje_error(f"No se pudo obtener, error: {ex}")
 
-    # Eliminar usario
-    @classmethod
-    def delete_producto(self, id):
+    def read_desc(self):
+        try:
+            self.cursor.execute("SELECT * FROM productos ORDER BY descripcion DESC")
+            productos = self.cursor.fetchall()
+            # print(productos)
+            return productos
+        except Exception as ex:
+            print("Error aca", ex)
+            # self.mensaje.mensaje_error(f"No se pudo obtener, error: {ex}")
+
+    # Eliminar un producto
+    def delete(self, id):
         try:
             self.cursor.execute("DELETE FROM productos WHERE id = ?", (id,))
             self.conexion.commit()
-            return True
-        except Exception:
-            print("Error al eliminar")
-            return False
+            self.mensaje.mensaje_ok("Eliminado correctamente")
+        except Exception as ex:
+            self.mensaje.mensaje_error(f"No se pudo eliminar error: {ex}")
 
     # Obtener todos los datos
 
-    # Actualizar dato
-    @classmethod
-    def update_producto(
-        self, descripcion, cantidad, precio_compra, recargo, precio_venta, id
-    ):
+    # Actualizar datos
+    def update(self, datos):
         try:
             self.cursor.execute(
                 "UPDATE productos SET descripcion = ?, cantidad = ?, precio_compra = ?, recargo = ?, precio_venta = ? WHERE id = ?",
-                (descripcion, cantidad, precio_compra, recargo, precio_venta, id),
+                (datos[1], datos[2], datos[3], datos[4], datos[5], datos[0]),
             )
             self.conexion.commit()
-            return True
-        except Exception:
-            print("No se pudo actualizar")
-            return False
+            self.mensaje.mensaje_ok("Actualizado correctamente")
+        except Exception as ex:
+            self.mensaje.mensaje_error(f"No se pudo actulizar, error: {ex}")

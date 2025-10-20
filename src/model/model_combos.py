@@ -1,89 +1,44 @@
-import sqlite3 as sql3
-import threading
-from flet import Container
-
 from model.model import Model
-
-# import time
+from views.mensaje import Mensaje
 
 
 class ModelCombos(Model):
 
-    def _init__(self):
-        pass
+    def __init__(self, page):
+        self.page = page
+        self.mensaje = Mensaje(self.page)
 
-    # # Conexion a Base de Datos
-    # try:
-    #     lock = threading.Lock()
-    #     conexion = sql3.connect("src/storage/db/mi_db.db", check_same_thread=False)
-    #     cursor = conexion.cursor()
-    # except Exception:
-    #     print(Exception)  # Conexion a Base de Datos
-
-    def get_descripcion_producto(self):
+    # Obtiene el id de un combo
+    def get_id_combo(self, nombre):
         try:
-            self.cursor.execute("SELECT descripcion FROM productos")
-            productos = self.cursor.fetchall()
+            self.cursor.execute("SELECT id FROM combo WHERE nombre = ?", (nombre))
+            return self.cursor.fetchone()[0]
 
-        except Exception:
-            print("Error al obtener los productos")
+        except Exception as ex:
+            self.mensaje(f"Error de coneccion:{ex}")
 
-        return productos
-
-    def get_producto(self, descripcion):
-        producto = []
+    def buscar(self, descripcion):
         try:
             self.cursor.execute(
-                "SELECT id, descripcion, precio_venta FROM productos WHERE descripcion = ?",
-                (descripcion,),
-            )
-            producto = self.cursor.fetchall()
-        except Exception:
-            print("Error al obtener los productos")
-
-        return producto
-
-    def get_producto2(self, descripcion):
-
-        producto = []
-        try:
-            # time.sleep(3)
-            #self.lock.acquire(True)
-            self.cursor.execute(
-                "SELECT id, descripcion, precio_venta FROM productos WHERE descripcion LIKE ? COLLATE NOCASE",
+                f"SELECT id, descripcion, precio_venta FROM productos WHERE descripcion LIKE ?",
                 (f"%{descripcion}%",),
             )
-            producto = self.cursor.fetchall()
-        except Exception as exp:
-            print(f"Error al obtener el id, descripcion, precio_venta: \n {exp}")
-        # finally:
-        #     self.lock.release()
+            productos = self.cursor.fetchall()
+            return productos
 
-        return producto
+        except Exception as ex:
+            self.mensaje.mensaje_error(f"Error de coneccion:{ex}")
+            print(ex)
 
-    def create(
-        self,
-        nombre,
-        precio,
-        id_producto,
-        descripcion_producto,
-        cantidad_producto,
-        subtotal_producto,
-    ):
+    # Agregar un nuevo combo
+    def create(self, nombre, descuento):
         try:
             self.cursor.execute(
-                "INSERT INTO combo (nombre, precio, id_producto, descripcion_producto, cantidad_producto, subtotal_producto) VALUES (?,?,?,?,?,?)",
-                (
-                    nombre,
-                    precio,
-                    id_producto,
-                    descripcion_producto,
-                    cantidad_producto,
-                    subtotal_producto,
-                ),
+                "INSERT INTO combo (nombre, descuento) VALUES (?,?)",
+                (nombre, descuento),
             )
             self.conexion.commit()
-            return True
-        except Exception as e:
-            print("Error de conexion:", e)
+            self.mensaje.mensaje_ok("Guardado")
+        except Exception as ex:
+            self.mensaje.mensaje_error(f"Error de coneccion: {ex}")
             return False
